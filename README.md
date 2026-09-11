@@ -16,6 +16,25 @@ tools\test.ps1
 tools\run-api.ps1
 ```
 
+By default, `tools\test.ps1` runs unit and planted-incident tests while excluding
+the integration category:
+
+```powershell
+.\tools\test.ps1
+```
+
+Run the integration suite against the running API with:
+
+```powershell
+.\tools\test.ps1 -Integration
+```
+
+To pass a VSTest filter explicitly, use `-Filter`:
+
+```powershell
+.\tools\test.ps1 -Filter "TestCategory=PlantedIncident"
+```
+
 The development SQL Server password and connection string are intentionally local-only defaults. Set `REINSURANCE_DB` or `MSSQL_SA_PASSWORD` to override them.
 
 The default local database is SQL Server on `localhost,14330`. `tools/db-up.ps1`

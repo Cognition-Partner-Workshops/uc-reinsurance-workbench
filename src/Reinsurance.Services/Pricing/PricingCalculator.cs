@@ -17,6 +17,7 @@ namespace Reinsurance.Services.Pricing
     public sealed class PricingOutput
     {
         public decimal TechnicalPremium { get; set; }
+        public decimal OurShare { get; set; }
         public decimal ExpectedLoss { get; set; }
         public decimal ExpenseLoad { get; set; }
         public decimal RiskLoad { get; set; }
@@ -34,10 +35,11 @@ namespace Reinsurance.Services.Pricing
             var riskLoad = RoundMoney(0.15m * (decimal)Math.Sqrt((double)(el * input.Limit)));
             var expenseLoad = RoundMoney(0.12m * (el + riskLoad));
             var basePremium = (el + riskLoad + expenseLoad) / (1m - 0.08m);
-            var premium = RoundMoney(basePremium * (1m - 0.05m * input.Reinstatements * input.ReinstatementPremiumPct));
+            var premium = RoundMoney(basePremium * (1m + 0.05m * input.Reinstatements * input.ReinstatementPremiumPct));
             return new PricingOutput
             {
                 TechnicalPremium = premium,
+                OurShare = RoundMoney(premium * input.SharePct),
                 ExpectedLoss = RoundMoney(el),
                 ExpenseLoad = expenseLoad,
                 RiskLoad = riskLoad,

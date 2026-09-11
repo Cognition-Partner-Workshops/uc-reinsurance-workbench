@@ -29,3 +29,7 @@ dividing the layer limit by the remaining portfolio loss after attachment. The
 Atlas boundary case leaves that denominator at zero. The raw
 `DivideByZeroException` propagates through pricing and is captured by the API
 exception handling path.
+
+The planted incident test pins this failure mode and verifies that the exception
+is captured by Sentry. If the incident is fixed, update the test to assert a
+finite hit fraction and revise the endpoint evidence accordingly.

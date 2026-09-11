@@ -55,7 +55,7 @@ namespace Reinsurance.Services.Pricing
         public virtual IList<PricingResultModel> GetPricing(int treatyId)
         {
             return _pricing.Table.Where(x => x.TreatyLayer.TreatyId == treatyId).OrderBy(x => x.TreatyLayer.LayerNumber)
-                .ToList().Select(x => ToModel(x, x.TreatyLayer.SharePct)).ToList();
+                .ToList().Select(x => ToModel(x, x.TechnicalPremium * x.TreatyLayer.SharePct)).ToList();
         }
 
         private PricingResultModel PriceLayerInternal(TreatyLayer layer)
@@ -113,10 +113,10 @@ namespace Reinsurance.Services.Pricing
             result.ReferralRequired = decision.Required;
             result.ReferralReasons = string.Join("; ", decision.Reasons);
             _pricing.Insert(result);
-            return ToModel(result, layer.SharePct);
+            return ToModel(result, output.OurShare);
         }
 
-        private static PricingResultModel ToModel(PricingResult result, decimal sharePct)
+        private static PricingResultModel ToModel(PricingResult result, decimal ourShare)
         {
             return new PricingResultModel
             {
@@ -130,7 +130,7 @@ namespace Reinsurance.Services.Pricing
                 ProfitMarginPct = result.ProfitMarginPct,
                 ReferralRequired = result.ReferralRequired,
                 ReferralReasons = result.ReferralReasons,
-                OurShareLine = result.TechnicalPremium * sharePct
+                OurShareLine = ourShare
             };
         }
     }
