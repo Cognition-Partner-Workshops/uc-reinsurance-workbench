@@ -124,4 +124,3 @@ keep the treaty available for investigation without attempting a bind action.
 The seeded quota-share treaty has no treaty layers. The treaty detail summary
 derives its exhaustion point from the top layer without handling an empty layer
 collection, so rendering the summary accesses a missing layer.
->>>>>>> origin/main
