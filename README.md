@@ -9,6 +9,11 @@ dependencies with Autofac.
 
 ## Local workflow
 
+To run the whole stack (SQL Server, API on Mono, web UI) on macOS or Linux with
+one command, see [docs/DOCKER.md](docs/DOCKER.md): `cp .env.example .env && docker compose up --build`.
+
+Windows workflow:
+
 ```powershell
 tools\db-up.ps1
 tools\build.ps1
