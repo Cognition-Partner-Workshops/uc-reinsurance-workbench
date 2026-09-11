@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Reinsurance.Tests.Api
@@ -85,6 +88,25 @@ namespace Reinsurance.Tests.Api
             Assert.That(authorities.Count, Is.EqualTo(4));
             foreach (Match authority in authorities)
                 Assert.That(decimal.Parse(authority.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture), Is.GreaterThan(0m));
+        }
+
+        [Test]
+        public void ApiRoutesSucceedForConcurrentUncachedUserAgents()
+        {
+            var paths = new[] { "/api/reference/underwriters", "/api/submissions?pageSize=100" };
+            var requests = new List<Task<HttpResponseMessage>>();
+            for (var i = 0; i < 16; i++)
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, paths[i % paths.Length]);
+                request.Headers.TryAddWithoutValidation(
+                    "User-Agent",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Electron/42.2.0 Safari/537.36 " + Guid.NewGuid().ToString("N"));
+                requests.Add(_client.SendAsync(request));
+            }
+
+            var responses = Task.WhenAll(requests).GetAwaiter().GetResult();
+
+            Assert.That(responses.Select(response => response.StatusCode), Is.All.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
