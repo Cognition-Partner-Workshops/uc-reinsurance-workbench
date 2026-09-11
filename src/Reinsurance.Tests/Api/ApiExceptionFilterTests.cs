@@ -3,11 +3,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using NUnit.Framework;
 using Reinsurance.Api;
+using Reinsurance.Tests.Fakes;
+using Sentry;
 
 namespace Reinsurance.Tests.Api
 {
@@ -37,6 +40,55 @@ namespace Reinsurance.Tests.Api
 
             Assert.That(bodyTraceId, Is.Not.Empty);
             Assert.That(headerTraceId, Is.EqualTo(bodyTraceId));
+        }
+
+        [Test]
+        public void ClientCancellationIsNotConvertedToInternalError()
+        {
+            var executedContext = ExecutedContext(new TaskCanceledException());
+
+            new ApiExceptionFilter().OnException(executedContext);
+
+            Assert.That(executedContext.Response, Is.Null);
+        }
+
+        [Test]
+        public void ClientCancellationIsNotCapturedBySentry()
+        {
+            var transport = new FakeTransport();
+            SentrySdk.Init(options =>
+            {
+                options.Dsn = "https://public@sentry.invalid/1";
+                options.Transport = transport;
+                options.FlushTimeout = TimeSpan.FromSeconds(5);
+            });
+            try
+            {
+                Assert.That(SentrySdk.IsEnabled, Is.True);
+
+                new ApiExceptionFilter().OnException(ExecutedContext(new TaskCanceledException()));
+                SentrySdk.Flush(TimeSpan.FromSeconds(5));
+                Assert.That(transport.Envelopes, Is.Empty);
+
+                new ApiExceptionFilter().OnException(ExecutedContext(new InvalidOperationException("test failure")));
+                SentrySdk.Flush(TimeSpan.FromSeconds(5));
+                Assert.That(transport.Envelopes, Has.Count.EqualTo(1));
+            }
+            finally
+            {
+                SentrySdk.Close();
+            }
+        }
+
+        private static HttpActionExecutedContext ExecutedContext(Exception exception)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/api/health");
+            request.SetConfiguration(new HttpConfiguration());
+            var actionContext = new HttpActionContext
+            {
+                ControllerContext = new HttpControllerContext { Request = request }
+            };
+            return new HttpActionExecutedContext(actionContext, exception);
         }
     }
 }
