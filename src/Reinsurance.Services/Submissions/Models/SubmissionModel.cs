@@ -10,10 +10,13 @@ namespace Reinsurance.Services.Submissions.Models
         public int Id { get; set; }
         public string Reference { get; set; }
         public int CedentId { get; set; }
+        public int? BrokerId { get; set; }
+        public int? UnderwriterId { get; set; }
         public string CedentName { get; set; }
         public string CedentRating { get; set; }
         public string BrokerName { get; set; }
         public string UnderwriterName { get; set; }
+        public decimal? UnderwriterAuthorityLimit { get; set; }
         public SubmissionStatus Status { get; set; }
         public DateTime ReceivedOn { get; set; }
         public DateTime InceptionDate { get; set; }

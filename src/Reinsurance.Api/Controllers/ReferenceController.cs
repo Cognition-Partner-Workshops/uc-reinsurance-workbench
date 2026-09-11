@@ -42,5 +42,25 @@ namespace Reinsurance.Api.Controllers
         {
             return Ok(_service.GetReferralRules());
         }
+
+        [HttpGet]
+        [Route("brokers")]
+        /// <summary>
+        /// Gets broker reference data.
+        /// </summary>
+        public IHttpActionResult Brokers()
+        {
+            return Ok(_service.GetBrokers());
+        }
+
+        [HttpGet]
+        [Route("underwriters")]
+        /// <summary>
+        /// Gets underwriter reference data.
+        /// </summary>
+        public IHttpActionResult Underwriters()
+        {
+            return Ok(_service.GetUnderwriters());
+        }
     }
 }

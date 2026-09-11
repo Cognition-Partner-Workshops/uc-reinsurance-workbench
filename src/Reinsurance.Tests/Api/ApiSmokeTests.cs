@@ -77,6 +77,17 @@ namespace Reinsurance.Tests.Api
         }
 
         [Test]
+        public void UnderwriterReferenceContainsAuthorities()
+        {
+            var body = Get("/api/reference/underwriters");
+            var authorities = Regex.Matches(body, "\"authorityLimit\":([0-9.]+)");
+
+            Assert.That(authorities.Count, Is.EqualTo(4));
+            foreach (Match authority in authorities)
+                Assert.That(decimal.Parse(authority.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture), Is.GreaterThan(0m));
+        }
+
+        [Test]
         public void HealthyTreatyPricingReturnsRateOnLine()
         {
             var response = _client.PostAsync("/api/treaties/1/price", new StringContent(string.Empty, Encoding.UTF8, "application/json")).GetAwaiter().GetResult();
