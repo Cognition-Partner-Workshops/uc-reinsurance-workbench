@@ -50,16 +50,35 @@ namespace Reinsurance.Tests.Pricing
 
         [Test]
         [Category("PlantedIncident")]
-        public void PlantedIncidentCurrentlyThrowsFromUngardedDenominator()
+        public void AttachmentEqualToPml250ProducesZeroExpectedLossWithoutThrowing()
         {
-            Assert.Throws<System.DivideByZeroException>(() => PricingCalculator.Calculate(new PricingInput
+            var result = PricingCalculator.Calculate(new PricingInput
             {
                 Limit = 25000000m,
                 Attachment = 100000000m,
                 AAL = 8500000m,
                 PML100 = 65000000m,
                 PML250 = 100000000m
-            }));
+            });
+
+            Assert.That(result.ExpectedLoss, Is.EqualTo(0m));
+            Assert.That(result.TechnicalPremium, Is.EqualTo(0m));
+            Assert.That(result.RateOnLine, Is.EqualTo(0m));
+        }
+
+        [Test]
+        [Category("Unit")]
+        public void LayerHitFractionIsZeroWhenAttachmentReachesOrExceedsPml250()
+        {
+            Assert.That(PricingCalculator.LayerHitFraction(25000000m, 100000000m, 100000000m), Is.EqualTo(0m));
+            Assert.That(PricingCalculator.LayerHitFraction(25000000m, 120000000m, 100000000m), Is.EqualTo(0m));
+        }
+
+        [Test]
+        [Category("Unit")]
+        public void LayerHitFractionBelowPml250IsUnchanged()
+        {
+            Assert.That(PricingCalculator.LayerHitFraction(100000000m, 200000000m, 400000000m), Is.EqualTo(0.25m));
         }
 
         [Test]
