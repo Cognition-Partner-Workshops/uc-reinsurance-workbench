@@ -8,13 +8,9 @@ import { ErrorBanner, PageHeader, Skeleton, StatusPill } from "../components/Ui"
 const legalTargets = (status?: SubmissionStatus) => {
     switch (status) {
         case SubmissionStatus.Received:
-            return [
-                SubmissionStatus.InReview,
-                SubmissionStatus.Declined,
-                SubmissionStatus.Withdrawn,
-            ];
+            return [SubmissionStatus.InReview, SubmissionStatus.Withdrawn];
         case SubmissionStatus.InReview:
-            return [SubmissionStatus.Quoted, SubmissionStatus.Declined, SubmissionStatus.Withdrawn];
+            return [SubmissionStatus.Quoted, SubmissionStatus.Withdrawn];
         case SubmissionStatus.Quoted:
             return [SubmissionStatus.Bound, SubmissionStatus.Declined, SubmissionStatus.Withdrawn];
         default:
