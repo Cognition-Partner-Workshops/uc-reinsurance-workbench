@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7B1A7A1F-4A3B-4A37-9B0F-49D9D7B7A005}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Reinsurance.Tests</RootNamespace>
+    <AssemblyName>Reinsurance.Tests</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.3.14.0\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Reinsurance.Core\Reinsurance.Core.csproj"><Project>{7B1A7A1F-4A3B-4A37-9B0F-49D9D7B7A001}</Project><Name>Reinsurance.Core</Name></ProjectReference>
+    <ProjectReference Include="..\Reinsurance.Services\Reinsurance.Services.csproj"><Project>{7B1A7A1F-4A3B-4A37-9B0F-49D9D7B7A003}</Project><Name>Reinsurance.Services</Name></ProjectReference>
+    <Compile Include="**\*.cs" Exclude="bin\**\*;obj\**\*" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
