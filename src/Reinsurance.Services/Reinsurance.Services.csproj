@@ -18,6 +18,9 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Sentry">
+      <HintPath>..\packages\Sentry.6.10.0\lib\net462\Sentry.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Reinsurance.Core\Reinsurance.Core.csproj">

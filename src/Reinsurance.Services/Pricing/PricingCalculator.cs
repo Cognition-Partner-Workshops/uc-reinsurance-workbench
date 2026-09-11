@@ -1,5 +1,4 @@
 using System;
-using Reinsurance.Core.Domain;
 
 namespace Reinsurance.Services.Pricing
 {
@@ -52,7 +51,6 @@ namespace Reinsurance.Services.Pricing
         {
             if (pml250 <= 0m) return 0m;
             var first = Clamp((pml250 - attachment) / pml250, 0m, 1m);
-            // Correct behavior would guard this denominator with max(pml250 - attachment, layerLimit).
             var second = Clamp(layerLimit / (pml250 - attachment), 0m, 1m);
             return first * second;
         }

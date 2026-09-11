@@ -6,8 +6,9 @@ namespace Reinsurance.Data.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationsEnabled = false;
             AutomaticMigrationDataLossAllowed = false;
+            ContextKey = "Reinsurance.Data.ReinsuranceObjectContext";
         }
     }
 }

@@ -19,6 +19,9 @@
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Reinsurance.Core\Reinsurance.Core.csproj">
@@ -27,6 +30,11 @@
     </ProjectReference>
     <Compile Include="**\*.cs" Exclude="bin\**\*;obj\**\*" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="Migrations\202609110433411_InitialCreate.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>202609110433411_InitialCreate.Designer.cs</LastGenOutput>
+      <ManifestResourceName>Reinsurance.Data.Migrations.InitialCreate</ManifestResourceName>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

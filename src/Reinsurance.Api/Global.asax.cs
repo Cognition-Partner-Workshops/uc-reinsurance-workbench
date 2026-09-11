@@ -22,6 +22,7 @@ namespace Reinsurance.Api
             SentryBootstrap.Initialize();
             AutofacConfig.Register();
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            RouteConfig.Register(System.Web.Routing.RouteTable.Routes);
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ReinsuranceObjectContext, MigrationConfiguration>());
             using (var context = new ReinsuranceObjectContext(ConnectionString(), new IDbSaveHook[] { new AuditableHook() }))
             {

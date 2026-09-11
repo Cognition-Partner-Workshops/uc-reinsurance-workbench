@@ -1,5 +1,5 @@
 using System.Web.Http;
-using Reinsurance.Services;
+using Reinsurance.Services.Cedents;
 
 namespace Reinsurance.Api.Controllers
 {
@@ -9,6 +9,10 @@ namespace Reinsurance.Api.Controllers
         private readonly ICedentService _service;
         public CedentsController(ICedentService service) { _service = service; }
         [HttpGet, Route("")] public IHttpActionResult Get() { return Ok(_service.GetAll()); }
-        [HttpGet, Route("{id:int}")] public IHttpActionResult Get(int id) { var result = _service.Get(id); return result == null ? (IHttpActionResult)NotFound() : Ok(result); }
+        [HttpGet, Route("{id:int}")] public IHttpActionResult Get(int id)
+        {
+            var result = _service.GetById(id);
+            return result == null ? (IHttpActionResult)NotFound() : Ok(result);
+        }
     }
 }

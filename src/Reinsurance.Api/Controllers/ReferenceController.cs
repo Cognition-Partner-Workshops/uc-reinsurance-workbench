@@ -1,5 +1,5 @@
 using System.Web.Http;
-using Reinsurance.Services;
+using Reinsurance.Services.Reference;
 
 namespace Reinsurance.Api.Controllers
 {
@@ -8,8 +8,8 @@ namespace Reinsurance.Api.Controllers
     {
         private readonly IReferenceService _service;
         public ReferenceController(IReferenceService service) { _service = service; }
-        [HttpGet, Route("perils")] public IHttpActionResult Perils() { return Ok(_service.Perils()); }
-        [HttpGet, Route("regions")] public IHttpActionResult Regions() { return Ok(_service.Regions()); }
-        [HttpGet, Route("referral-rules")] public IHttpActionResult ReferralRules() { return Ok(_service.ReferralRules()); }
+        [HttpGet, Route("perils")] public IHttpActionResult Perils() { return Ok(_service.GetPerils()); }
+        [HttpGet, Route("regions")] public IHttpActionResult Regions() { return Ok(_service.GetRegions()); }
+        [HttpGet, Route("referral-rules")] public IHttpActionResult ReferralRules() { return Ok(_service.GetReferralRules()); }
     }
 }

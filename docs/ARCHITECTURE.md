@@ -8,4 +8,11 @@ The workbench is a classic ASP.NET Web API 2 application targeting .NET Framewor
 - `Reinsurance.Api` hosts the HTTP API under IIS Express and wires Autofac and Sentry.
 - `Reinsurance.Tests` contains NUnit tests.
 
-EF6 automatic migrations are enabled as the portable fallback for this hand-written classic-project implementation. The application initializes the database and then seeds it when the `Cedent` table is empty.
+EF6 automatic migrations are disabled. The explicit `InitialCreate` migration
+contains the schema and generated model snapshot; application startup migrates
+the database and then seeds it when the `Cedent` table is empty.
+
+Each business area keeps its entity, mapping, service, and model files together.
+Repositories expose EF queryables to the services, while save hooks provide
+auditing at the context boundary. Autofac composes the per-request context,
+repositories, hooks, services, MVC controllers, and Web API controllers.

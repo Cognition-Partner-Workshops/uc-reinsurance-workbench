@@ -1,6 +1,8 @@
 using System.Web.Http;
-using Reinsurance.Services;
-using Reinsurance.Services.DTOs;
+using Reinsurance.Core.Domain.Submissions;
+using Reinsurance.Services.CatModel;
+using Reinsurance.Services.Submissions;
+using Reinsurance.Services.Submissions.Models;
 
 namespace Reinsurance.Api.Controllers
 {
@@ -8,12 +10,27 @@ namespace Reinsurance.Api.Controllers
     public sealed class SubmissionsController : ApiController
     {
         private readonly ISubmissionService _service;
-        public SubmissionsController(ISubmissionService service) { _service = service; }
-        [HttpGet, Route("")] public IHttpActionResult Get() { return Ok(_service.GetAll()); }
-        [HttpGet, Route("{id:int}")] public IHttpActionResult Get(int id) { var result = _service.Get(id); return result == null ? (IHttpActionResult)NotFound() : Ok(result); }
-        [HttpPost, Route("")] public IHttpActionResult Post(SubmissionCreateDto dto) { return Ok(_service.Create(dto)); }
-        [HttpPost, Route("{id:int}/transition")] public IHttpActionResult Transition(int id, TransitionDto dto) { var result = _service.Transition(id, dto); return result == null ? (IHttpActionResult)NotFound() : Ok(result); }
-        [HttpGet, Route("{id:int}/exposure")] public IHttpActionResult Exposure(int id) { return Ok(_service.Exposure(id)); }
-        [HttpGet, Route("{id:int}/cat-model")] public IHttpActionResult CatModel(int id) { return Ok(_service.CatModel(id)); }
+        private readonly ICatModelResultService _catModels;
+        public SubmissionsController(ISubmissionService service, ICatModelResultService catModels) { _service = service; _catModels = catModels; }
+        [HttpGet, Route("")]
+        public IHttpActionResult Get(SubmissionStatus? status = null, int? cedentId = null, int page = 1, int pageSize = 20)
+        {
+            var result = _service.Search(new SubmissionSearchQuery { Status = status, CedentId = cedentId, PageIndex = page <= 0 ? 0 : page - 1, PageSize = pageSize });
+            return Ok(new { items = result, page = result.PageNumber, pageSize = result.PageSize, totalCount = result.TotalCount, totalPages = result.TotalPages });
+        }
+        [HttpGet, Route("{id:int}")] public IHttpActionResult Get(int id)
+        {
+            var result = _service.GetById(id);
+            return result == null ? (IHttpActionResult)NotFound() : Ok(result);
+        }
+        [HttpPost, Route("")] public IHttpActionResult Post(SubmissionCreateRequest request) { return Ok(_service.Create(request)); }
+        [HttpPost, Route("{id:int}/transition")] public IHttpActionResult Transition(int id, SubmissionTransitionRequest request) { return Ok(_service.Transition(id, request.Status)); }
+        [HttpGet, Route("{id:int}/exposure")] public IHttpActionResult Exposure(int id) { return Ok(new { summary = _service.GetExposureSummary(id), records = _service.GetExposureRecords(id) }); }
+        [HttpGet, Route("{id:int}/cat-model")] public IHttpActionResult CatModel(int id) { return Ok(_catModels.GetAll(id)); }
+    }
+
+    public sealed class SubmissionTransitionRequest
+    {
+        public SubmissionStatus Status { get; set; }
     }
 }

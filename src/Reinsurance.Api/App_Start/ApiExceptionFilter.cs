@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Filters;
+using Reinsurance.Core.Exceptions;
 using Sentry;
 
 namespace Reinsurance.Api
@@ -11,11 +12,17 @@ namespace Reinsurance.Api
         public override void OnException(HttpActionExecutedContext actionExecutedContext)
         {
             var exception = actionExecutedContext.Exception;
-            if (SentrySdk.IsEnabled) SentrySdk.CaptureException(exception);
+            var status = exception is EntityNotFoundException
+                ? HttpStatusCode.NotFound
+                : exception is InvalidSubmissionTransitionException || exception is PricingException
+                    ? HttpStatusCode.Conflict
+                    : HttpStatusCode.InternalServerError;
+            if (status == HttpStatusCode.InternalServerError && SentrySdk.IsEnabled)
+                SentrySdk.CaptureException(exception);
             var traceId = Guid.NewGuid().ToString("N");
-            actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(HttpStatusCode.InternalServerError, new
+            actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(status, new
             {
-                title = "Unhandled exception",
+                title = status == HttpStatusCode.NotFound ? "Not found" : status == HttpStatusCode.Conflict ? "Request conflict" : "Unhandled exception",
                 detail = exception.Message,
                 traceId
             });
