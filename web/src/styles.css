@@ -743,6 +743,11 @@ label {
     background: #fff1f1;
     color: #a52222;
 }
+.error-fallback {
+    max-width: 460px;
+    margin: 15vh auto;
+    padding: 24px;
+}
 .error-banner small,
 .success-banner {
     display: block;

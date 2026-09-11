@@ -11,6 +11,9 @@ using Reinsurance.Data.Hooks;
 using Reinsurance.Data.Migrations;
 using Reinsurance.Data.Setup;
 using Sentry;
+using Sentry.AspNet;
+using Sentry.Extensibility;
+using Sentry.Infrastructure;
 using MigrationConfiguration = Reinsurance.Data.Migrations.Configuration;
 
 namespace Reinsurance.Api
@@ -33,8 +36,17 @@ namespace Reinsurance.Api
 
         protected void Application_Error()
         {
-            var exception = Server.GetLastError();
-            if (exception != null && SentrySdk.IsEnabled) SentrySdk.CaptureException(exception);
+            if (SentrySdk.IsEnabled) Context.Server.CaptureLastError();
+        }
+
+        protected void Application_BeginRequest()
+        {
+            if (SentrySdk.IsEnabled) Context.StartSentryTransaction();
+        }
+
+        protected void Application_EndRequest()
+        {
+            if (SentrySdk.IsEnabled) Context.FinishSentryTransaction();
         }
 
         internal static string ConnectionString()
@@ -54,8 +66,19 @@ namespace Reinsurance.Api
             SentrySdk.Init(o =>
             {
                 o.Dsn = dsn;
+                o.AddAspNet(RequestSize.Small);
+                o.TracesSampleRate = 1.0;
+                o.SendDefaultPii = false;
+                o.AttachStacktrace = true;
+                var debugLog = Environment.GetEnvironmentVariable("SENTRY_DEBUG_LOG");
+                if (!string.IsNullOrWhiteSpace(debugLog))
+                {
+                    o.Debug = true;
+                    o.DiagnosticLogger = new FileDiagnosticLogger(debugLog, SentryLevel.Debug);
+                }
                 o.Environment = Environment.GetEnvironmentVariable("REINSURANCE_ENVIRONMENT") ?? "Development";
-                o.Release = Environment.GetEnvironmentVariable("REINSURANCE_RELEASE") ?? "reinsurance-workbench";
+                o.Release = Environment.GetEnvironmentVariable("REINSURANCE_RELEASE")
+                    ?? "reinsurance-workbench@" + typeof(WebApiApplication).Assembly.GetName().Version;
             });
         }
     }
