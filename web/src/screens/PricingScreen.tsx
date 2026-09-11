@@ -132,9 +132,11 @@ export default function PricingScreen() {
             </div>
             <PageHeader eyebrow="Quote" title={treatyData.name}>
                 <div className="header-controls">
-                    <span className="preview-label">
-                        Preview — server pricing uses saved layer terms
-                    </span>
+                    {hasEdits && (
+                        <span className="preview-label">
+                            Preview — server pricing uses saved layer terms
+                        </span>
+                    )}
                     <div className="layer-tabs">
                         {treatyData.layers.map((item, index) => (
                             <button
@@ -237,7 +239,7 @@ export default function PricingScreen() {
                                     {hasEdits
                                         ? "Preview"
                                         : persistedResult
-                                          ? `Calculated ${formatRunDate(persistedResult)}`
+                                          ? `Saved quote · Calculated ${formatRunDate(persistedResult)}`
                                           : "Preview"}
                                 </div>
                             </>

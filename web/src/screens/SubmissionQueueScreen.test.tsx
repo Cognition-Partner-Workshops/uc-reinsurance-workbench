@@ -72,4 +72,25 @@ describe("SubmissionQueueScreen", () => {
         });
         expect(screen.getByText("SUB-2026-0002")).toBeInTheDocument();
     });
+
+    it("filters rows when the Received chip is selected", async () => {
+        const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+        render(
+            <QueryClientProvider client={client}>
+                <MemoryRouter>
+                    <SubmissionQueueScreen />
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        expect(await screen.findByText("SUB-2026-0001")).toBeInTheDocument();
+        expect(screen.getByText("SUB-2026-0002")).toBeInTheDocument();
+        const received = screen.getByRole("button", { name: /Received 1/ });
+        await userEvent.click(received);
+        expect(received).toHaveClass("selected");
+        await waitFor(() => {
+            expect(screen.getByText("SUB-2026-0001")).toBeInTheDocument();
+        });
+        expect(screen.queryByText("SUB-2026-0002")).not.toBeInTheDocument();
+    });
 });

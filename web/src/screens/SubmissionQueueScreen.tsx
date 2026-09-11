@@ -42,7 +42,7 @@ export default function SubmissionQueueScreen() {
     const queryClient = useQueryClient();
     const rows = (submissions.data?.items ?? []).filter(
         (row) =>
-            (!filter || row.status === filter) &&
+            (filter === undefined || row.status === filter) &&
             (!search ||
                 `${row.reference} ${row.cedentName}`.toLowerCase().includes(search.toLowerCase())),
     );

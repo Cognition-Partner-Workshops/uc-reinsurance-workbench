@@ -1,28 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useSubmission, useTransitionSubmission } from "../api/queries";
 import { SubmissionStatus, submissionStatusLabels } from "../api/types";
 import { fmtDate } from "../domain/format";
 import { ErrorBanner, PageHeader, Skeleton, StatusPill } from "../components/Ui";
 
+const legalTargets = (status?: SubmissionStatus) => {
+    switch (status) {
+        case SubmissionStatus.Received:
+            return [
+                SubmissionStatus.InReview,
+                SubmissionStatus.Declined,
+                SubmissionStatus.Withdrawn,
+            ];
+        case SubmissionStatus.InReview:
+            return [SubmissionStatus.Quoted, SubmissionStatus.Declined, SubmissionStatus.Withdrawn];
+        case SubmissionStatus.Quoted:
+            return [SubmissionStatus.Bound, SubmissionStatus.Declined, SubmissionStatus.Withdrawn];
+        default:
+            return [];
+    }
+};
+
 export default function SubmissionDetailScreen() {
     const id = Number(useParams().id);
     const submission = useSubmission(id);
     const transition = useTransitionSubmission();
-    const [next, setNext] = useState<SubmissionStatus>(SubmissionStatus.InReview);
+    const [next, setNext] = useState<SubmissionStatus>();
     const navigate = useNavigate();
+    useEffect(() => {
+        setNext(legalTargets(submission.data?.status)[0]);
+    }, [submission.data?.status]);
     if (submission.isLoading) return <Skeleton className="skeleton-card" />;
     if (submission.error || !submission.data)
         return <ErrorBanner error={submission.error ?? new Error("Submission not found.")} />;
     const item = submission.data;
-    const options =
-        item.status === SubmissionStatus.Received
-            ? [SubmissionStatus.InReview, SubmissionStatus.Withdrawn]
-            : item.status === SubmissionStatus.InReview
-              ? [SubmissionStatus.Quoted, SubmissionStatus.Withdrawn]
-              : item.status === SubmissionStatus.Quoted
-                ? [SubmissionStatus.Bound, SubmissionStatus.Declined, SubmissionStatus.Withdrawn]
-                : [SubmissionStatus.Withdrawn];
+    const options = legalTargets(item.status);
     return (
         <>
             <PageHeader eyebrow="Submission" title={item.reference}>
@@ -59,7 +72,8 @@ export default function SubmissionDetailScreen() {
                     </p>
                     <div className="inline-form">
                         <select
-                            value={next}
+                            value={next ?? ""}
+                            disabled={!options.length}
                             onChange={(event) => setNext(Number(event.target.value))}
                         >
                             {options.map((status) => (
@@ -70,8 +84,12 @@ export default function SubmissionDetailScreen() {
                         </select>
                         <button
                             className="primary-button"
-                            disabled={transition.isPending}
-                            onClick={() => transition.mutate({ id, status: next })}
+                            disabled={transition.isPending || next === undefined}
+                            onClick={() => {
+                                if (next !== undefined) {
+                                    transition.mutate({ id, status: next });
+                                }
+                            }}
                         >
                             Transition
                         </button>
