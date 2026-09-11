@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Migrations;
 using System.Web;
 using System.Web.Http;
 using Autofac;
@@ -26,7 +28,12 @@ namespace Reinsurance.Api
             AutofacConfig.Register();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.Register(System.Web.Routing.RouteTable.Routes);
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<ReinsuranceObjectContext, MigrationConfiguration>());
+            var migrationConfiguration = new MigrationConfiguration
+            {
+                TargetDatabase = new DbConnectionInfo(ConnectionString(), "System.Data.SqlClient")
+            };
+            new DbMigrator(migrationConfiguration).Update();
+            Database.SetInitializer<ReinsuranceObjectContext>(null);
             using (var context = new ReinsuranceObjectContext(ConnectionString(), new IDbSaveHook[] { new AuditableHook() }))
             {
                 context.Database.Initialize(false);

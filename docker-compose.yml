@@ -1,0 +1,57 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:-Reins3ure!Dev}
+    ports: ["14330:1433"]
+    volumes: [mssql-data:/var/opt/mssql]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - >-
+        for i in $$(seq 1 30); do
+        /opt/mssql-tools18/bin/sqlcmd -S db,1433 -U sa
+        -P "$$MSSQL_SA_PASSWORD" -C
+        -Q "IF DB_ID(N'ReinsuranceWorkbench') IS NULL CREATE DATABASE [ReinsuranceWorkbench]"
+        -b && exit 0;
+        sleep 2;
+        done;
+        exit 1
+    environment:
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:-Reins3ure!Dev}
+  api:
+    build: { context: ., dockerfile: docker/api.Dockerfile }
+    platform: linux/amd64
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    environment:
+      REINSURANCE_DB: "Server=db,1433;Database=ReinsuranceWorkbench;User Id=sa;Password=${SA_PASSWORD:-Reins3ure!Dev};TrustServerCertificate=True;Encrypt=False;"
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      REINSURANCE_ENVIRONMENT: ${REINSURANCE_ENVIRONMENT:-docker}
+    ports: ["5055:5055"]
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      args:
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
+        VITE_SENTRY_ENVIRONMENT: ${VITE_SENTRY_ENVIRONMENT:-docker}
+    depends_on: [api]
+    ports: ["5173:80"]
+volumes:
+  mssql-data:

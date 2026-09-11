@@ -1,0 +1,7 @@
+web/node_modules
+**/bin
+**/obj
+src/packages
+.git
+legacy
+ui-wireframes
