@@ -30,9 +30,17 @@ Atlas boundary case leaves that denominator at zero. The raw
 `DivideByZeroException` propagates through pricing and is captured by the API
 exception handling path.
 
-The planted incident test pins this failure mode and verifies that the exception
-is captured by Sentry. If the incident is fixed, update the test to assert a
-finite hit fraction and revise the endpoint evidence accordingly.
+## Resolution
+
+`LayerHitFraction` now returns `0` whenever the portfolio loss above the
+attachment (`PML250 - attachment`) is zero or negative: a layer attaching at or
+above the PML250 is never hit, so its expected loss, loads, and premium are all
+zero. `POST /api/treaties/{atlasTreatyId}/price` returns HTTP 200 with a zero
+priced third layer and no Sentry event.
+
+`AtlasPricingIncidentTests` and `PricingCalculatorTests` pin the boundary case
+as a finite, zero-valued pricing result and verify that no Sentry envelope is
+produced.
 
 # Loss-history incident: Sakura General burning cost
 
