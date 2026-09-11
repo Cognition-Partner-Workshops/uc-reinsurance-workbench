@@ -34,6 +34,26 @@ namespace Reinsurance.Services.Exposure
             return ExposureCalculator.Summarize(records, model == null ? 0m : model.PML250);
         }
 
+        public virtual IDictionary<int, ExposureSummary> GetSummaries(IEnumerable<int> submissionIds)
+        {
+            Guard.NotNull(submissionIds, nameof(submissionIds));
+            var ids = submissionIds.Distinct().ToList();
+            if (ids.Count == 0)
+                return new Dictionary<int, ExposureSummary>();
+            var records = _repository.Table.Where(x => ids.Contains(x.SubmissionId))
+                .Include(x => x.Region)
+                .Include(x => x.Peril)
+                .ToList()
+                .ToLookup(x => x.SubmissionId);
+            var models = _catModels.Table.Where(x => ids.Contains(x.SubmissionId) && x.RegionId == null && x.PerilId == null)
+                .ToList()
+                .GroupBy(x => x.SubmissionId)
+                .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.RunOn).First());
+            return ids.ToDictionary(
+                id => id,
+                id => ExposureCalculator.Summarize(records[id], models.ContainsKey(id) ? models[id].PML250 : 0m));
+        }
+
         public virtual IList<ExposureRecordModel> GetRecords(int submissionId)
         {
             return _repository.Table.Where(x => x.SubmissionId == submissionId)

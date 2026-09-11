@@ -1,4 +1,4 @@
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./client";
 import type {
     BrokerModel,
@@ -7,6 +7,7 @@ import type {
     ExposureRecordModel,
     ExposureSummary,
     PagedList,
+    PortfolioModel,
     PricingResultModel,
     ReferralRuleModel,
     SubmissionCreateRequest,
@@ -93,60 +94,10 @@ export function useUnderwriters() {
 }
 
 export function usePortfolio() {
-    const submissions = useSubmissions();
-    const details = useQueries({
-        queries: (submissions.data?.items ?? []).map((item) => ({
-            queryKey: ["submission", item.id],
-            queryFn: () => api<SubmissionModel>(`/api/submissions/${item.id}`),
-        })),
+    return useQuery({
+        queryKey: ["portfolio"],
+        queryFn: () => api<PortfolioModel>("/api/portfolio"),
     });
-    const detailItems = details.map((query) => query.data).filter(Boolean) as SubmissionModel[];
-    const treatyIds = detailItems.flatMap((submission) =>
-        submission.treaties.map((treaty) => treaty.id),
-    );
-    const treatyPricing = useQueries({
-        queries: treatyIds.map((id) => ({
-            queryKey: ["pricing", id],
-            queryFn: () => api<PricingResultModel[]>(`/api/treaties/${id}/pricing`),
-        })),
-    });
-    const catModels = useQueries({
-        queries: detailItems.map((submission) => ({
-            queryKey: ["cat-model", submission.id],
-            queryFn: () =>
-                api<CatModelResultModel[]>(`/api/submissions/${submission.id}/cat-model`),
-        })),
-    });
-    const exposures = useQueries({
-        queries: detailItems.map((submission) => ({
-            queryKey: ["exposure", submission.id],
-            queryFn: () =>
-                api<{ summary: ExposureSummary; records: ExposureRecordModel[] }>(
-                    `/api/submissions/${submission.id}/exposure`,
-                ),
-        })),
-    });
-    return {
-        submissions,
-        details,
-        detailItems,
-        treatyIds,
-        treatyPricing,
-        catModels,
-        exposures,
-        isLoading:
-            submissions.isLoading ||
-            details.some((query) => query.isLoading) ||
-            treatyPricing.some((query) => query.isLoading) ||
-            catModels.some((query) => query.isLoading) ||
-            exposures.some((query) => query.isLoading),
-        error:
-            submissions.error ||
-            details.find((query) => query.error)?.error ||
-            treatyPricing.find((query) => query.error)?.error ||
-            catModels.find((query) => query.error)?.error ||
-            exposures.find((query) => query.error)?.error,
-    };
 }
 
 export function usePriceTreaty() {
@@ -157,7 +108,10 @@ export function usePriceTreaty() {
                 method: "POST",
                 body: "{}",
             }),
-        onSuccess: (_, treatyId) => client.invalidateQueries({ queryKey: ["pricing", treatyId] }),
+        onSuccess: (_, treatyId) => {
+            client.invalidateQueries({ queryKey: ["pricing", treatyId] });
+            client.invalidateQueries({ queryKey: ["portfolio"] });
+        },
     });
 }
 
@@ -169,6 +123,7 @@ export function useBindTreaty() {
         onSuccess: (treaty) => {
             client.invalidateQueries({ queryKey: ["treaty", treaty.id] });
             client.invalidateQueries({ queryKey: ["submissions"] });
+            client.invalidateQueries({ queryKey: ["portfolio"] });
         },
     });
 }
@@ -184,6 +139,7 @@ export function useTransitionSubmission() {
         onSuccess: (submission) => {
             client.invalidateQueries({ queryKey: ["submission", submission.id] });
             client.invalidateQueries({ queryKey: ["submissions"] });
+            client.invalidateQueries({ queryKey: ["portfolio"] });
         },
     });
 }
@@ -196,6 +152,9 @@ export function useCreateSubmission() {
                 method: "POST",
                 body: JSON.stringify(body),
             }),
-        onSuccess: () => client.invalidateQueries({ queryKey: ["submissions"] }),
+        onSuccess: () => {
+            client.invalidateQueries({ queryKey: ["submissions"] });
+            client.invalidateQueries({ queryKey: ["portfolio"] });
+        },
     });
 }

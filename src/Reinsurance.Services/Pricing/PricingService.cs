@@ -58,6 +58,24 @@ namespace Reinsurance.Services.Pricing
                 .ToList().Select(x => ToModel(x, x.TechnicalPremium * x.TreatyLayer.SharePct)).ToList();
         }
 
+        public virtual IDictionary<int, IList<PricingResultModel>> GetPricing(IEnumerable<int> treatyIds)
+        {
+            Guard.NotNull(treatyIds, nameof(treatyIds));
+            var ids = treatyIds.Distinct().ToList();
+            if (ids.Count == 0)
+                return new Dictionary<int, IList<PricingResultModel>>();
+            return _pricing.Table.Where(x => ids.Contains(x.TreatyLayer.TreatyId))
+                .Include(x => x.TreatyLayer)
+                .ToList()
+                .GroupBy(x => x.TreatyLayer.TreatyId)
+                .ToDictionary(
+                    group => group.Key,
+                    group => (IList<PricingResultModel>)group
+                        .OrderBy(x => x.TreatyLayer.LayerNumber)
+                        .Select(x => ToModel(x, x.TechnicalPremium * x.TreatyLayer.SharePct))
+                        .ToList());
+        }
+
         private PricingResultModel PriceLayerInternal(TreatyLayer layer)
         {
             if (SentrySdk.IsEnabled)

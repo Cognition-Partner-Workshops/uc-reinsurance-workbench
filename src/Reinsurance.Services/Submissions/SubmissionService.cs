@@ -40,6 +40,11 @@ namespace Reinsurance.Services.Submissions
             return entity == null ? null : ToModel(entity);
         }
 
+        public virtual IList<SubmissionModel> GetAll()
+        {
+            return Query().OrderByDescending(x => x.Id).ToList().Select(ToModel).ToList();
+        }
+
         public virtual IPagedList<SubmissionListItemModel> Search(SubmissionSearchQuery query)
         {
             Guard.NotNull(query, nameof(query));

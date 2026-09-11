@@ -8,6 +8,7 @@ namespace Reinsurance.Services.Submissions
     public partial interface ISubmissionService
     {
         SubmissionModel GetById(int submissionId);
+        System.Collections.Generic.IList<SubmissionModel> GetAll();
         IPagedList<SubmissionListItemModel> Search(SubmissionSearchQuery query);
         SubmissionModel Create(SubmissionCreateRequest request);
         SubmissionModel Transition(int submissionId, SubmissionStatus status);

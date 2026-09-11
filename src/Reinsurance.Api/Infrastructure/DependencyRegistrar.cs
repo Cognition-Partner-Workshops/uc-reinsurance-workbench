@@ -10,6 +10,7 @@ using Reinsurance.Services.CatModel;
 using Reinsurance.Services.Cedents;
 using Reinsurance.Services.Exposure;
 using Reinsurance.Services.LossHistory;
+using Reinsurance.Services.Portfolio;
 using Reinsurance.Services.Pricing;
 using Reinsurance.Services.Referrals;
 using Reinsurance.Services.Reference;
@@ -34,6 +35,7 @@ namespace Reinsurance.Api.Infrastructure
             builder.RegisterType<ExposureService>().As<IExposureService>().InstancePerRequest();
             builder.RegisterType<CatModelResultService>().As<ICatModelResultService>().InstancePerRequest();
             builder.RegisterType<PricingService>().As<IPricingService>().InstancePerRequest();
+            builder.RegisterType<PortfolioService>().As<IPortfolioService>().InstancePerRequest();
             builder.RegisterType<ReferralService>().As<IReferralService>().InstancePerRequest();
             builder.RegisterType<LossHistoryService>().As<ILossHistoryService>().InstancePerRequest();
             builder.RegisterType<ReferenceService>().As<IReferenceService>().InstancePerRequest();

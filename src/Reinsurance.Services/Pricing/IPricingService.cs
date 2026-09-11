@@ -8,5 +8,6 @@ namespace Reinsurance.Services.Pricing
         PricingResultModel PriceLayer(int treatyLayerId);
         IList<PricingResultModel> PriceTreaty(int treatyId);
         IList<PricingResultModel> GetPricing(int treatyId);
+        IDictionary<int, IList<PricingResultModel>> GetPricing(IEnumerable<int> treatyIds);
     }
 }
