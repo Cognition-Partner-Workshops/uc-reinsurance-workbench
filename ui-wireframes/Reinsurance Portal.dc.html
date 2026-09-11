@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#fcfcfc;color:#191919;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#317cff;text-decoration:none}a:hover{text-decoration:underline}
+input,select{font-family:Inter,system-ui,sans-serif}
+</style>
+</helmet>
+<div style="display:flex;min-height:100vh;font-size:13px;line-height:18px">
+  <nav style="width:220px;flex:none;background:#f8f8f8;border-right:1px solid #e7e7e7;display:flex;flex-direction:column;padding:16px 12px;gap:4px;position:sticky;top:0;height:100vh;box-sizing:border-box">
+    <div style="display:flex;align-items:center;gap:10px;padding:4px 8px 18px">
+      <div style="width:22px;height:22px;background:#191919;border-radius:6px;flex:none"></div>
+      <div>
+        <div style="font-weight:600;font-size:13px">Reinsurance Workbench</div>
+        <div style="font-size:11px;color:rgba(25,25,25,0.56)">Underwriting portal</div>
+      </div>
+    </div>
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="4">
+      <button onClick="{{ n.go }}" style="display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border:0;border-radius:6px;background:{{ n.bg }};color:{{ n.fg }};font:inherit;font-weight:500;text-align:left;cursor:pointer" style-hover="background:rgba(0,0,0,0.06)">
+        <span style="width:6px;height:6px;border-radius:999px;background:{{ n.dot }};flex:none"></span>{{ n.label }}
+        <span style="margin-left:auto;font-size:11px;color:rgba(25,25,25,0.4);font-family:'IBM Plex Mono',monospace">{{ n.count }}</span>
+      </button>
+    </sc-for>
+    <div style="margin-top:auto;padding:12px 8px;border-top:1px solid #e7e7e7;display:flex;align-items:center;gap:10px">
+      <div style="width:26px;height:26px;border-radius:999px;background:#e7e7e7;flex:none"></div>
+      <div>
+        <div style="font-weight:500">Tomas Keller</div>
+        <div style="font-size:11px;color:rgba(25,25,25,0.56)">Authority $50.0M</div>
+      </div>
+    </div>
+  </nav>
+
+  <main style="flex:1;min-width:0;padding:28px 36px 48px;box-sizing:border-box">
+
+    <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Dashboard">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.03em;text-transform:uppercase;color:rgba(25,25,25,0.56);display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="width:8px;height:8px;background:#317cff;display:inline-block"></span>Portfolio</div>
+            <h1 style="margin:0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-0.02em">2026 treaty portfolio</h1>
+          </div>
+          <div style="display:inline-flex;gap:2px;padding:2px;background:rgba(0,0,0,0.06);border-radius:8px">
+            <button style="font:inherit;font-weight:500;height:24px;padding:0 12px;border:1px solid rgba(0,0,0,0.08);background:#fff;border-radius:6px;color:#191919;cursor:pointer">Property Cat</button>
+            <button style="font:inherit;font-weight:500;height:24px;padding:0 12px;border:0;background:none;border-radius:6px;color:rgba(25,25,25,0.56);cursor:pointer">All lines</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:28px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:16px 18px;box-shadow:0 1px 2px rgba(0,0,0,0.05)">
+              <div style="font-size:12px;color:rgba(25,25,25,0.56);margin-bottom:6px">{{ k.label }}</div>
+              <div style="font-size:26px;line-height:1.1;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ k.value }}</div>
+              <div style="font-size:12px;color:rgba(25,25,25,0.56);margin-top:8px">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:20px;align-items:start">
+          <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow-x:auto;min-width:0">
+            <div style="min-width:560px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #e7e7e7">
+              <div style="font-weight:600">Treaties</div>
+              <div style="font-size:12px;color:rgba(25,25,25,0.56)">{{ treatyCountLabel }}</div>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,2.2fr) 1fr 1fr 1fr 96px;gap:12px;padding:8px 16px;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;color:rgba(25,25,25,0.56);font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #f2f2f2">
+              <div>Treaty</div><div style="text-align:right">Limit</div><div style="text-align:right">Premium</div><div style="text-align:right">PML 250</div><div>Status</div>
+            </div>
+            <sc-for list="{{ treatyRows }}" as="t" hint-placeholder-count="6">
+              <div onClick="{{ t.open }}" style="display:grid;grid-template-columns:minmax(0,2.2fr) 1fr 1fr 1fr 96px;gap:12px;padding:11px 16px;border-bottom:1px solid #f2f2f2;cursor:pointer;align-items:center;font-variant-numeric:tabular-nums" style-hover="background:#f8f8f8">
+                <div style="min-width:0"><div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.name }}</div><div style="font-size:12px;color:rgba(25,25,25,0.56)">{{ t.cedent }} · {{ t.type }}</div></div>
+                <div style="text-align:right">{{ t.limit }}</div>
+                <div style="text-align:right">{{ t.premium }}</div>
+                <div style="text-align:right">{{ t.pml }}</div>
+                <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;background:{{ t.pillBg }};color:{{ t.pillFg }}">{{ t.status }}</span></div>
+              </div>
+            </sc-for>
+            </div>
+          </section>
+
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow:hidden">
+              <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600">Upcoming renewals</div>
+              <sc-for list="{{ renewals }}" as="r" hint-placeholder-count="3">
+                <div onClick="{{ r.open }}" style="display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-bottom:1px solid #f2f2f2;cursor:pointer" style-hover="background:#f8f8f8">
+                  <div style="min-width:0"><div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</div><div style="font-size:12px;color:rgba(25,25,25,0.56)">Expires {{ r.expiry }}</div></div>
+                  <div style="text-align:right;flex:none"><div style="font-weight:500;font-variant-numeric:tabular-nums">{{ r.days }}d</div><div style="font-size:12px;color:rgba(25,25,25,0.56)">{{ r.premium }}</div></div>
+                </div>
+              </sc-for>
+            </section>
+            <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow:hidden">
+              <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600">Exposure by peril</div>
+              <div style="padding:8px 16px 14px;display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ perils }}" as="p" hint-placeholder-count="5">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>{{ p.name }}</span><span style="color:rgba(25,25,25,0.56);font-variant-numeric:tabular-nums">{{ p.value }}</span></div>
+                    <div style="height:6px;background:rgba(0,0,0,0.06);border-radius:999px;overflow:hidden"><div style="height:100%;width:{{ p.pct }};background:#317cff"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isQueue }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Submission Queue">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.03em;text-transform:uppercase;color:rgba(25,25,25,0.56);display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="width:8px;height:8px;background:#317cff;display:inline-block"></span>Submissions</div>
+            <h1 style="margin:0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-0.02em">Submission queue</h1>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input placeholder="Search reference or cedent" style="height:28px;padding:0 10px;border:1px solid #e7e7e7;border-radius:6px;background:#fff;font-size:13px;width:220px;outline:none">
+            <button style="font:inherit;font-weight:500;height:28px;padding:0 12px;border-radius:6px;border:0;background:#191919;color:#fff;cursor:pointer">New submission</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+          <sc-for list="{{ queueFilters }}" as="f" hint-placeholder-count="4">
+            <button onClick="{{ f.set }}" style="font:inherit;font-weight:500;height:26px;padding:0 10px;border-radius:999px;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.fg }};cursor:pointer">{{ f.label }} <span style="opacity:0.6">{{ f.count }}</span></button>
+          </sc-for>
+        </div>
+        <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow-x:auto">
+          <div style="min-width:860px">
+          <div style="display:grid;grid-template-columns:120px minmax(0,1.6fr) 60px minmax(0,1.3fr) minmax(0,1.1fr) 100px 110px;gap:12px;padding:8px 16px;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;color:rgba(25,25,25,0.56);font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #f2f2f2">
+            <div>Reference</div><div>Cedent</div><div>Rating</div><div>Broker</div><div>Underwriter</div><div>Received</div><div>Status</div>
+          </div>
+          <sc-for list="{{ queueRows }}" as="s" hint-placeholder-count="8">
+            <div onClick="{{ s.open }}" style="display:grid;grid-template-columns:120px minmax(0,1.6fr) 60px minmax(0,1.3fr) minmax(0,1.1fr) 100px 110px;gap:12px;padding:11px 16px;border-bottom:1px solid #f2f2f2;align-items:center;cursor:pointer" style-hover="background:#f8f8f8">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px">{{ s.ref }}</div>
+              <div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.cedent }}</div>
+              <div>{{ s.rating }}</div>
+              <div style="color:rgba(25,25,25,0.56);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.broker }}</div>
+              <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.uw }}</div>
+              <div style="color:rgba(25,25,25,0.56);font-variant-numeric:tabular-nums">{{ s.received }}</div>
+              <div><span style="display:inline-flex;align-items:center;height:20px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;background:{{ s.pillBg }};color:{{ s.pillFg }}">{{ s.status }}</span></div>
+            </div>
+          </sc-for>
+          </div>
+        </section>
+        <div style="font-size:12px;color:rgba(25,25,25,0.4);margin-top:12px">Inception 1 Jan 2026 · Expiry 31 Dec 2026 · Property catastrophe placements</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Treaty Detail">
+        <div style="font-size:12px;color:rgba(25,25,25,0.56);margin-bottom:12px;display:flex;gap:6px"><a href="#" onClick="{{ goDashboard }}">Portfolio</a><span>/</span><span>{{ d.ref }}</span></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+          <div>
+            <h1 style="margin:0 0 6px;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-0.02em">{{ d.name }}</h1>
+            <div style="color:rgba(25,25,25,0.56);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <span>{{ d.cedent }}</span><span>·</span><span>{{ d.type }}</span><span>·</span><span>USD</span><span>·</span><span>{{ d.period }}</span>
+              <span style="display:inline-flex;align-items:center;height:20px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;background:{{ d.pillBg }};color:{{ d.pillFg }}">{{ d.status }}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ goPricing }}" style="font:inherit;font-weight:500;height:28px;padding:0 12px;border-radius:6px;border:1px solid #e7e7e7;background:#fff;color:#191919;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.05)">Re-price</button>
+            <button style="font:inherit;font-weight:500;height:28px;padding:0 12px;border-radius:6px;border:0;background:#191919;color:#fff;cursor:pointer">{{ d.primaryAction }}</button>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+          <sc-for list="{{ d.stats }}" as="k" hint-placeholder-count="5">
+            <div style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;padding:14px 16px">
+              <div style="font-size:12px;color:rgba(25,25,25,0.56);margin-bottom:4px">{{ k.label }}</div>
+              <div style="font-size:20px;line-height:1.2;font-weight:600;letter-spacing:-0.02em;font-variant-numeric:tabular-nums">{{ k.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:20px;align-items:start">
+          <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow-x:auto">
+            <div style="min-width:640px">
+            <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600">Layers</div>
+            <div style="display:grid;grid-template-columns:56px 1fr 1fr 1fr 1fr 1fr 72px;gap:12px;padding:8px 16px;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;color:rgba(25,25,25,0.56);font-family:'IBM Plex Mono',monospace;border-bottom:1px solid #f2f2f2">
+              <div>Layer</div><div style="text-align:right">Limit</div><div style="text-align:right">Attach</div><div style="text-align:right">Exp. loss</div><div style="text-align:right">Premium</div><div style="text-align:right">ROL</div><div style="text-align:right">Reinst.</div>
+            </div>
+            <sc-for list="{{ d.layers }}" as="l" hint-placeholder-count="3">
+              <div style="display:grid;grid-template-columns:56px 1fr 1fr 1fr 1fr 1fr 72px;gap:12px;padding:11px 16px;border-bottom:1px solid #f2f2f2;align-items:center;font-variant-numeric:tabular-nums">
+                <div style="font-weight:500">{{ l.n }}</div>
+                <div style="text-align:right">{{ l.limit }}</div>
+                <div style="text-align:right">{{ l.attach }}</div>
+                <div style="text-align:right">{{ l.el }}</div>
+                <div style="text-align:right;font-weight:500">{{ l.premium }}</div>
+                <div style="text-align:right">{{ l.rol }}</div>
+                <div style="text-align:right;color:rgba(25,25,25,0.56)">{{ l.reinst }}</div>
+              </div>
+            </sc-for>
+            <div style="display:grid;grid-template-columns:56px 1fr 1fr 1fr 1fr 1fr 72px;gap:12px;padding:11px 16px;align-items:center;font-variant-numeric:tabular-nums;background:#f8f8f8;font-weight:600">
+              <div>Total</div><div style="text-align:right">{{ d.totLimit }}</div><div></div><div style="text-align:right">{{ d.totEl }}</div><div style="text-align:right">{{ d.totPremium }}</div><div></div><div></div>
+            </div>
+            </div>
+          </section>
+
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow:hidden">
+              <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600;display:flex;justify-content:space-between"><span>Cat model</span><span style="color:rgba(25,25,25,0.56);font-weight:400">{{ d.model }}</span></div>
+              <div style="padding:6px 16px 10px">
+                <sc-for list="{{ d.modelRows }}" as="m" hint-placeholder-count="4">
+                  <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f2f2f2;font-variant-numeric:tabular-nums"><span style="color:rgba(25,25,25,0.56)">{{ m.label }}</span><span style="font-weight:500">{{ m.value }}</span></div>
+                </sc-for>
+              </div>
+            </section>
+            <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow:hidden">
+              <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600">Placement</div>
+              <div style="padding:6px 16px 10px">
+                <sc-for list="{{ d.placement }}" as="m" hint-placeholder-count="4">
+                  <div style="display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #f2f2f2"><span style="color:rgba(25,25,25,0.56)">{{ m.label }}</span><span style="font-weight:500;text-align:right">{{ m.value }}</span></div>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPricing }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Pricing / Quote">
+        <div style="font-size:12px;color:rgba(25,25,25,0.56);margin-bottom:12px;display:flex;gap:6px"><a href="#" onClick="{{ goDashboard }}">Portfolio</a><span>/</span><a href="#" onClick="{{ goDetail }}">{{ d.ref }}</a><span>/</span><span>Pricing</span></div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.03em;text-transform:uppercase;color:rgba(25,25,25,0.56);display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="width:8px;height:8px;background:#317cff;display:inline-block"></span>Quote</div>
+            <h1 style="margin:0;font-size:24px;line-height:1.2;font-weight:600;letter-spacing:-0.02em">{{ d.name }}</h1>
+          </div>
+          <div style="display:inline-flex;gap:2px;padding:2px;background:rgba(0,0,0,0.06);border-radius:8px">
+            <sc-for list="{{ layerTabs }}" as="lt" hint-placeholder-count="3">
+              <button onClick="{{ lt.set }}" style="font:inherit;font-weight:500;height:24px;padding:0 12px;border:1px solid {{ lt.border }};background:{{ lt.bg }};border-radius:6px;color:{{ lt.fg }};cursor:pointer">{{ lt.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;align-items:start">
+          <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow:hidden">
+            <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600">Treaty parameters</div>
+            <div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ fields }}" as="f" hint-placeholder-count="5">
+                <label style="display:flex;flex-direction:column;gap:6px">
+                  <span style="font-size:12px;color:rgba(25,25,25,0.56)">{{ f.label }}</span>
+                  <span style="display:flex;align-items:center;border:1px solid #e7e7e7;border-radius:6px;background:#fff;height:32px;overflow:hidden">
+                    <span style="padding:0 10px;color:rgba(25,25,25,0.4);font-size:12px;border-right:1px solid #f2f2f2;height:100%;display:flex;align-items:center;min-width:32px;justify-content:center;background:#f8f8f8">{{ f.unit }}</span>
+                    <input type="number" step="{{ f.step }}" value="{{ f.value }}" onChange="{{ f.onChange }}" style="flex:1;min-width:0;border:0;outline:none;height:100%;padding:0 10px;font-size:13px;font-variant-numeric:tabular-nums;background:transparent;color:#191919">
+                  </span>
+                </label>
+              </sc-for>
+              <div style="border-top:1px solid #f2f2f2;padding-top:12px;font-size:12px;color:rgba(25,25,25,0.56);display:flex;flex-direction:column;gap:4px">
+                <div style="display:flex;justify-content:space-between"><span>Portfolio AAL</span><span style="font-variant-numeric:tabular-nums">{{ q.aal }}</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Portfolio PML 250</span><span style="font-variant-numeric:tabular-nums">{{ q.pml }}</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Model</span><span>{{ d.model }}</span></div>
+              </div>
+              <button onClick="{{ resetLayer }}" style="font:inherit;font-weight:500;height:28px;border-radius:6px;border:1px solid #e7e7e7;background:#fff;color:#191919;cursor:pointer;align-self:flex-start">Reset to layer</button>
+            </div>
+          </section>
+
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <sc-if value="{{ q.error }}" hint-placeholder-val="{{ false }}">
+              <section style="background:#fff;border:1px solid rgba(245,59,58,0.4);border-radius:8px;padding:16px 18px">
+                <div style="display:flex;align-items:center;gap:8px;font-weight:600;color:#d12c2b;margin-bottom:6px"><span style="width:8px;height:8px;border-radius:999px;background:#f53b3a"></span>Pricing failed</div>
+                <div style="color:rgba(25,25,25,0.56)">Attachment equals portfolio PML 250, so the layer-hit denominator is zero. Routed for review; the treaty cannot be bound. <span style="font-family:'IBM Plex Mono',monospace;font-size:12px">POST /api/treaties/{{ d.id }}/price → 500</span></div>
+              </section>
+            </sc-if>
+            <sc-if value="{{ q.ok }}" hint-placeholder-val="{{ true }}">
+              <section style="background:#191919;color:#fff;border-radius:8px;padding:20px 22px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap">
+                  <div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:6px">Technical premium</div>
+                    <div style="font-size:34px;line-height:1.05;font-weight:600;letter-spacing:-0.03em;font-variant-numeric:tabular-nums">{{ q.premium }}</div>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:8px">Our share {{ q.ourShare }} · Calculated {{ q.calcOn }}</div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:auto auto;gap:6px 24px;font-variant-numeric:tabular-nums;font-size:13px">
+                    <span style="color:rgba(255,255,255,0.6)">Rate on line</span><span style="text-align:right;font-weight:500">{{ q.rol }}</span>
+                    <span style="color:rgba(255,255,255,0.6)">Loss cost</span><span style="text-align:right;font-weight:500">{{ q.lossCost }}</span>
+                    <span style="color:rgba(255,255,255,0.6)">Profit margin</span><span style="text-align:right;font-weight:500">8.0%</span>
+                  </div>
+                </div>
+              </section>
+              <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow:hidden">
+                <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600">Premium build-up</div>
+                <div style="padding:6px 16px 10px">
+                  <sc-for list="{{ q.buildup }}" as="b" hint-placeholder-count="4">
+                    <div style="display:grid;grid-template-columns:minmax(150px,1.4fr) 110px minmax(60px,1fr);gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid #f2f2f2;font-variant-numeric:tabular-nums">
+                      <span style="color:rgba(25,25,25,0.56)">{{ b.label }}</span>
+                      <span style="text-align:right;font-weight:500">{{ b.value }}</span>
+                      <span style="height:6px;background:rgba(0,0,0,0.06);border-radius:999px;overflow:hidden;display:block"><span style="display:block;height:100%;width:{{ b.pct }};background:#317cff"></span></span>
+                    </div>
+                  </sc-for>
+                </div>
+              </section>
+              <section style="background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:8px;overflow:hidden">
+                <div style="padding:12px 16px;border-bottom:1px solid #e7e7e7;font-weight:600;display:flex;justify-content:space-between;align-items:center"><span>Referral check</span><span style="display:inline-flex;align-items:center;height:20px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:500;background:{{ q.refBg }};color:{{ q.refFg }}">{{ q.refLabel }}</span></div>
+                <div style="padding:6px 16px 10px">
+                  <sc-for list="{{ q.rules }}" as="r" hint-placeholder-count="5">
+                    <div style="display:flex;gap:10px;align-items:baseline;padding:7px 0;border-bottom:1px solid #f2f2f2">
+                      <span style="width:8px;height:8px;border-radius:999px;background:{{ r.dot }};flex:none;position:relative;top:-1px"></span>
+                      <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:92px;flex:none">{{ r.code }}</span>
+                      <span style="color:rgba(25,25,25,0.56);flex:1">{{ r.text }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="padding:12px 16px;border-top:1px solid #e7e7e7;display:flex;gap:8px;justify-content:flex-end">
+                  <button style="font:inherit;font-weight:500;height:28px;padding:0 12px;border-radius:6px;border:1px solid #e7e7e7;background:#fff;color:#191919;cursor:pointer">Save quote</button>
+                  <button style="font:inherit;font-weight:500;height:28px;padding:0 12px;border-radius:6px;border:0;background:{{ q.bindBg }};color:#fff;cursor:pointer">{{ q.bindLabel }}</button>
+                </div>
+              </section>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;currencyFormat&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;compact&quot;,&quot;full&quot;],&quot;default&quot;:&quot;compact&quot;,&quot;tsType&quot;:&quot;'compact' | 'full'&quot;,&quot;section&quot;:&quot;Display&quot;}}">
+const CEDENTS = [
+  { name: "Meridian Mutual", code: "CED-001", country: "US", rating: "A+" },
+  { name: "Gulfstream P&C", code: "CED-002", country: "US", rating: "A" },
+  { name: "Pacific Crest Insurance", code: "CED-003", country: "US", rating: "A" },
+  { name: "Northwind Assurance", code: "CED-004", country: "CA", rating: "A-" },
+  { name: "Iberia Seguros", code: "CED-005", country: "ES", rating: "B++" },
+  { name: "Sakura General", code: "CED-006", country: "JP", rating: "B+" }
+];
+const BROKERS = ["Halcyon Re Brokers", "Crestline Intermediaries", "Northgate Re"];
+const UWS = [{ name: "Priya Raman", auth: 25e6 }, { name: "Tomas Keller", auth: 50e6 }, { name: "Aisha Bello", auth: 100e6 }, { name: "Daniel Okafor", auth: 250e6 }];
+const STATUSES = ["Received", "Received", "Received", "In review", "In review", "Quoted", "Quoted", "Bound", "Bound", "Declined"];
+const VENDORS = ["RMS v23", "AIR v10", "Internal v2026.1"];
+const PERILS = ["Earthquake", "Windstorm", "Flood", "Wildfire", "Severe Convective Storm"];
+const RATING_ORDER = ["B", "B+", "B++", "A-", "A", "A+", "A++"];
+const TODAY = new Date(2026, 8, 11);
+
+const SUBS = STATUSES.map((status, i) => {
+  const cedent = CEDENTS[i % 6];
+  const pml250 = i === 2 ? 300e6 : 250e6 + i * 15e6;
+  const layers = [
+    { n: 1, limit: 25e6, attach: 25e6, reinst: 1, reinstPct: 0.5, share: 1 },
+    { n: 2, limit: 50e6, attach: 50e6, reinst: 1, reinstPct: 0.5, share: 1 }
+  ];
+  if (i % 3 === 0 || i === 2) layers.push({ n: 3, limit: i === 2 ? 25e6 : 100e6, attach: i === 2 ? 300e6 : 100e6, reinst: 1, reinstPct: 0.5, share: 1 });
+  const d = new Date(2026, 0, 5 + i);
+  return {
+    id: i + 1, ref: "SUB-2026-" + String(i + 1).padStart(4, "0"), cedent, broker: BROKERS[i % 3], uw: UWS[i % 4],
+    received: d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }), status,
+    treaty: { name: i === 2 ? "Atlas Specialty Property Cat XoL 2026" : cedent.name + " Property Cat XoL 2026", type: i === 9 ? "Quota Share" : "Property Cat XoL",
+      status: status === "Bound" ? "Bound" : status === "Declined" ? "Draft" : "Quoted", layers },
+    model: { vendor: VENDORS[i % 3], pml250, aal: pml250 * 0.03, el: pml250 * 0.025, pml50: pml250 * 0.35, pml100: pml250 * 0.65 }
+  };
+});
+
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+function price(l, m) {
+  if (m.pml250 - l.attach === 0) return { error: true };
+  const hit = clamp((m.pml250 - l.attach) / m.pml250, 0, 1) * clamp(l.limit / (m.pml250 - l.attach), 0, 1);
+  const el = m.aal * hit;
+  const risk = 0.15 * Math.sqrt(el * l.limit);
+  const exp = 0.12 * (el + risk);
+  const base = (el + risk + exp) / 0.92;
+  const premium = base * (1 + 0.05 * l.reinst * l.reinstPct);
+  return { error: false, el, risk, exp, premium, ourShare: premium * l.share, rol: l.limit ? premium / l.limit : 0, lossCost: l.limit ? el / l.limit : 0 };
+}
+const fmtM = v => (v >= 1e9 ? "$" + (v / 1e9).toFixed(2) + "B" : "$" + (v / 1e6).toFixed(v >= 100e6 ? 0 : 1) + "M");
+const fmtFull = v => "$" + Math.round(v).toLocaleString("en-US");
+const fmtPct = v => (v * 100).toFixed(2) + "%";
+const PILL = {
+  Received: ["rgba(49,124,255,0.12)", "#2d6ae0"], "In review": ["rgba(245,142,58,0.14)", "#c9690f"], Quoted: ["rgba(49,124,255,0.12)", "#2d6ae0"],
+  Bound: ["rgba(0,165,88,0.12)", "#00813f"], Declined: ["rgba(245,59,58,0.12)", "#d12c2b"], Draft: ["rgba(25,25,25,0.06)", "rgba(25,25,25,0.56)"], Expired: ["rgba(25,25,25,0.06)", "rgba(25,25,25,0.56)"]
+};
+
+class Component extends DCLogic {
+  state = { screen: "dashboard", selected: 3, layer: 0, filter: "All", edit: null };
+  go(screen, extra) { this.setState({ screen, ...(extra || {}) }); window.scrollTo(0, 0); }
+  money(v) { return (this.props.currencyFormat ?? "compact") === "full" ? fmtFull(v) : fmtM(v); }
+  renderVals() {
+    const { screen, selected, layer, filter, edit } = this.state;
+    const money = v => this.money(v);
+    const sub = SUBS.find(s => s.id === selected) || SUBS[2];
+    const openDetail = s => () => this.go("detail", { selected: s.id, layer: 0, edit: null });
+    const treaties = SUBS.filter(s => s.status !== "Declined");
+    const priced = treaties.map(s => ({ s, res: s.treaty.layers.map(l => price(l, s.model)) }));
+    const premiumOf = p => p.res.reduce((a, r) => a + (r.error ? 0 : r.premium), 0);
+    const limitOf = s => s.treaty.layers.reduce((a, l) => a + l.limit, 0);
+    const bound = priced.filter(p => p.s.status === "Bound");
+    const days = Math.round((new Date(2026, 11, 31) - TODAY) / 864e5);
+    const perilBase = treaties.reduce((a, s) => a + s.model.pml250, 0);
+    const perilVals = PERILS.map((n, i) => ({ name: n, v: perilBase * 0.3 * (1 - i * 0.12) }));
+    const maxP = perilVals[0].v;
+
+    const nav = (id, label, count) => ({ label, count, go: () => this.go(id), bg: screen === id ? "#fff" : "transparent", fg: screen === id ? "#191919" : "rgba(25,25,25,0.56)", dot: screen === id ? "#317cff" : "transparent" });
+    const filters = ["All", "Received", "In review", "Quoted", "Bound"];
+    const queue = SUBS.filter(s => filter === "All" || s.status === filter);
+
+    // pricing state
+    const baseLayer = sub.treaty.layers[Math.min(layer, sub.treaty.layers.length - 1)];
+    const cur = edit || baseLayer;
+    const q = price(cur, sub.model);
+    const set = k => e => this.setState({ edit: { ...cur, [k]: parseFloat(e.target.value) || 0 } });
+    const rules = [];
+    const flag = (code, text, hit) => rules.push({ code, text, hit, dot: hit ? "#f53b3a" : "#00a558" });
+    flag("MAX-LAYER", cur.limit > 150e6 ? "Layer exceeds the maximum layer limit of $150M." : "Layer within $150M maximum layer limit.", cur.limit > 150e6);
+    flag("MIN-ROL", !q.error && q.rol < 0.02 ? "Rate on line is below the 2.00% minimum." : "Rate on line above 2.00% minimum.", !q.error && q.rol < 0.02);
+    flag("MAX-ROL", !q.error && q.rol > 0.35 ? "Rate on line is above the 35.00% maximum." : "Rate on line below 35.00% maximum.", !q.error && q.rol > 0.35);
+    const ratingLow = RATING_ORDER.indexOf(sub.cedent.rating) < RATING_ORDER.indexOf("B++");
+    flag("RATING", ratingLow ? "Cedent rating " + sub.cedent.rating + " is below the required B++." : "Cedent rated " + sub.cedent.rating + " (required B++).", ratingLow);
+    flag("AUTHORITY", cur.limit > sub.uw.auth ? "Layer exceeds " + sub.uw.name + "'s authority of " + fmtM(sub.uw.auth) + "." : "Within " + sub.uw.name + "'s authority of " + fmtM(sub.uw.auth) + ".", cur.limit > sub.uw.auth);
+    const refRequired = rules.some(r => r.hit);
+    const totalP = q.error ? 1 : q.premium;
+
+    const dTot = priced.find(p => p.s.id === sub.id) || { res: [] };
+    return {
+      navItems: [nav("dashboard", "Portfolio", treaties.length), nav("queue", "Submissions", SUBS.filter(s => s.status === "Received" || s.status === "In review").length), nav("detail", "Treaty detail", ""), nav("pricing", "Pricing", "")],
+      isDashboard: screen === "dashboard", isQueue: screen === "queue", isDetail: screen === "detail", isPricing: screen === "pricing",
+      goDashboard: e => { e.preventDefault(); this.go("dashboard"); }, goDetail: e => { e.preventDefault(); this.go("detail"); }, goPricing: () => this.go("pricing", { edit: null }),
+      kpis: [
+        { label: "Bound premium", value: money(bound.reduce((a, p) => a + premiumOf(p), 0)), sub: bound.length + " bound treaties" },
+        { label: "Quoted pipeline", value: money(priced.filter(p => p.s.status !== "Bound").reduce((a, p) => a + premiumOf(p), 0)), sub: priced.length - bound.length + " quoted treaties" },
+        { label: "Aggregate limit", value: money(treaties.reduce((a, s) => a + limitOf(s), 0)), sub: "Across " + treaties.reduce((a, s) => a + s.treaty.layers.length, 0) + " layers" },
+        { label: "Portfolio PML 250", value: money(perilBase), sub: "Sum of ceded portfolio PMLs" },
+        { label: "Renewals", value: String(bound.length), sub: "Expire 31 Dec 2026 · " + days + " days" }
+      ],
+      treatyCountLabel: treaties.length + " treaties · 2026 year",
+      treatyRows: priced.map(p => ({ name: p.s.treaty.name, cedent: p.s.cedent.name, type: p.s.treaty.type, limit: money(limitOf(p.s)), premium: p.res.some(r => r.error) ? "Error" : money(premiumOf(p)), pml: money(p.s.model.pml250), status: p.s.treaty.status, pillBg: PILL[p.s.treaty.status][0], pillFg: PILL[p.s.treaty.status][1], open: openDetail(p.s) })),
+      renewals: bound.map(p => ({ name: p.s.treaty.name, expiry: "31 Dec 2026", days, premium: money(premiumOf(p)), open: openDetail(p.s) })),
+      perils: perilVals.map(p => ({ name: p.name, value: money(p.v), pct: Math.round(p.v / maxP * 100) + "%" })),
+      queueFilters: filters.map(f => { const on = f === filter; return { label: f, count: f === "All" ? SUBS.length : SUBS.filter(s => s.status === f).length, set: () => this.setState({ filter: f }), bg: on ? "#191919" : "#fff", fg: on ? "#fff" : "#191919", border: on ? "#191919" : "#e7e7e7" }; }),
+      queueRows: queue.map(s => ({ ref: s.ref, cedent: s.cedent.name, rating: s.cedent.rating, broker: s.broker, uw: s.uw.name, received: s.received, status: s.status, pillBg: PILL[s.status][0], pillFg: PILL[s.status][1], open: openDetail(s) })),
+      d: {
+        id: sub.id, ref: sub.ref, name: sub.treaty.name, cedent: sub.cedent.name, type: sub.treaty.type, period: "1 Jan – 31 Dec 2026", status: sub.treaty.status, pillBg: PILL[sub.treaty.status][0], pillFg: PILL[sub.treaty.status][1],
+        primaryAction: sub.treaty.status === "Bound" ? "Endorse" : "Bind treaty", model: sub.model.vendor,
+        stats: [
+          { label: "Total limit", value: money(limitOf(sub)) }, { label: "Attachment (L1)", value: money(sub.treaty.layers[0].attach) },
+          { label: "Technical premium", value: dTot.res.some(r => r.error) ? "—" : money(premiumOf(dTot)) }, { label: "Expected loss", value: money(dTot.res.reduce((a, r) => a + (r.error ? 0 : r.el), 0)) },
+          { label: "Modeled PML 250", value: money(sub.model.pml250) }
+        ],
+        layers: sub.treaty.layers.map((l, i) => { const r = dTot.res[i] || price(l, sub.model); return { n: "L" + l.n, limit: money(l.limit), attach: money(l.attach), el: r.error ? "—" : money(r.el), premium: r.error ? "Error" : money(r.premium), rol: r.error ? "—" : fmtPct(r.rol), reinst: l.reinst + " @ " + Math.round(l.reinstPct * 100) + "%" }; }),
+        totLimit: money(limitOf(sub)), totEl: money(dTot.res.reduce((a, r) => a + (r.error ? 0 : r.el), 0)), totPremium: dTot.res.some(r => r.error) ? "—" : money(premiumOf(dTot)),
+        modelRows: [{ label: "AAL", value: money(sub.model.aal) }, { label: "PML 50", value: money(sub.model.pml50) }, { label: "PML 100", value: money(sub.model.pml100) }, { label: "PML 250", value: money(sub.model.pml250) }],
+        placement: [{ label: "Submission", value: sub.ref }, { label: "Cedent rating", value: sub.cedent.rating + " · " + sub.cedent.country }, { label: "Broker", value: sub.broker }, { label: "Underwriter", value: sub.uw.name }, { label: "Received", value: sub.received + " 2026" }]
+      },
+      layerTabs: sub.treaty.layers.map((l, i) => { const on = i === Math.min(layer, sub.treaty.layers.length - 1); return { label: "Layer " + l.n, set: () => this.setState({ layer: i, edit: null }), bg: on ? "#fff" : "transparent", fg: on ? "#191919" : "rgba(25,25,25,0.56)", border: on ? "rgba(0,0,0,0.08)" : "transparent" }; }),
+      fields: [
+        { label: "Limit", unit: "$", step: 1000000, value: cur.limit, onChange: set("limit") },
+        { label: "Attachment point", unit: "$", step: 1000000, value: cur.attach, onChange: set("attach") },
+        { label: "Reinstatements", unit: "#", step: 1, value: cur.reinst, onChange: set("reinst") },
+        { label: "Reinstatement premium", unit: "×", step: 0.05, value: cur.reinstPct, onChange: set("reinstPct") },
+        { label: "Our share", unit: "×", step: 0.05, value: cur.share, onChange: set("share") }
+      ],
+      resetLayer: () => this.setState({ edit: null }),
+      q: {
+        error: q.error, ok: !q.error, aal: money(sub.model.aal), pml: money(sub.model.pml250),
+        premium: q.error ? "" : fmtFull(q.premium), ourShare: q.error ? "" : fmtFull(q.ourShare), calcOn: "11 Sep 2026",
+        rol: q.error ? "" : fmtPct(q.rol), lossCost: q.error ? "" : fmtPct(q.lossCost),
+        buildup: q.error ? [] : [
+          { label: "Expected loss", value: fmtFull(q.el), pct: Math.round(q.el / totalP * 100) + "%" },
+          { label: "Risk load", value: fmtFull(q.risk), pct: Math.round(q.risk / totalP * 100) + "%" },
+          { label: "Expense load", value: fmtFull(q.exp), pct: Math.round(q.exp / totalP * 100) + "%" },
+          { label: "Profit margin + reinstatements", value: fmtFull(q.premium - q.el - q.risk - q.exp), pct: Math.round((q.premium - q.el - q.risk - q.exp) / totalP * 100) + "%" }
+        ],
+        rules, refLabel: refRequired ? "Referral required" : "Within authority", refBg: refRequired ? "rgba(245,142,58,0.14)" : "rgba(0,165,88,0.12)", refFg: refRequired ? "#c9690f" : "#00813f",
+        bindLabel: refRequired ? "Refer for approval" : "Bind treaty", bindBg: refRequired ? "#f58e3a" : "#191919"
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

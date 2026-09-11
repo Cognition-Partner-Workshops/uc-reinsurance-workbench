@@ -6,3 +6,4 @@ packages/
 TestResults/
 *.mdf
 *.ldf
+.DS_Store
