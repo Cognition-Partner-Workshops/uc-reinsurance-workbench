@@ -1,8 +1,10 @@
 # Pricing incident: Atlas layer pricing
 
+Status: fixed (Sentry `BACKEND-REINSURANCE-DEMO-1`).
+
 ## Symptom
 
-Pricing the third layer of `Atlas Specialty Property Cat XoL 2026` returns HTTP
+Pricing the third layer of `Atlas Specialty Property Cat XoL 2026` returned HTTP
 500. When Sentry is enabled, the captured event is tagged with the treaty and
 layer identifiers.
 
@@ -11,8 +13,9 @@ layer identifiers.
 1. Start SQL Server with `tools/db-up.ps1`.
 2. Start the API with `tools/run-api.ps1`.
 3. Submit `POST /api/treaties/{atlasTreatyId}/price`.
-4. Observe the unhandled arithmetic exception response and the corresponding
-   Sentry event.
+4. Before the fix: observe the unhandled arithmetic exception response and the
+   corresponding Sentry event. After the fix: the response is HTTP 200 and the
+   Atlas layer 3 result carries a zero expected loss and premium.
 
 The Atlas layer attachment equals the submission portfolio `PML250`, making the
 case deterministic in the demo dataset.
@@ -26,13 +29,17 @@ tags, and route the incident for review rather than binding the treaty.
 
 `PricingCalculator.LayerHitFraction` calculates the second layer-hit factor by
 dividing the layer limit by the remaining portfolio loss after attachment. The
-Atlas boundary case leaves that denominator at zero. The raw
-`DivideByZeroException` propagates through pricing and is captured by the API
+Atlas boundary case left that denominator at zero. The raw
+`DivideByZeroException` propagated through pricing and was captured by the API
 exception handling path.
 
-The planted incident test pins this failure mode and verifies that the exception
-is captured by Sentry. If the incident is fixed, update the test to assert a
-finite hit fraction and revise the endpoint evidence accordingly.
+## Fix
+
+`LayerHitFraction` now returns `0` when the attachment is at or above `PML250`:
+no modelled loss reaches the layer, so its hit fraction, expected loss, and
+technical premium are all zero. `AtlasPricingIncidentTests` and the
+`PricingCalculatorTests` boundary cases pin this behaviour and verify that no
+Sentry event is emitted for the Atlas inputs.
 
 # Loss-history incident: Sakura General burning cost
 
@@ -118,3 +125,4 @@ keep the treaty available for investigation without attempting a bind action.
 The seeded quota-share treaty has no treaty layers. The treaty detail summary
 derives its exhaustion point from the top layer without handling an empty layer
 collection, so rendering the summary accesses a missing layer.
+>>>>>>> origin/main
