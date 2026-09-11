@@ -1,8 +1,10 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Reinsurance.Tests.Api
@@ -95,6 +97,24 @@ namespace Reinsurance.Tests.Api
 
             Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(DecimalValue(body, "rateOnLine"), Is.InRange(0.01m, 0.5m));
+        }
+
+        [Test]
+        public void ConcurrentRequestsFromUnknownUserAgentsSucceed()
+        {
+            var paths = new[] { "/api/submissions", "/api/reference/underwriters" };
+            var requests = Enumerable.Range(0, 24).Select(i =>
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, paths[i % paths.Length]);
+                request.Headers.TryAddWithoutValidation(
+                    "User-Agent",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) reinsurance-workbench/1.0.0 Chrome/142.0.0.0 Electron/42.2.0 Safari/537.36 " + Guid.NewGuid().ToString("N"));
+                return _client.SendAsync(request);
+            }).ToArray();
+
+            var responses = Task.WhenAll(requests).GetAwaiter().GetResult();
+
+            Assert.That(responses.Select(r => r.StatusCode), Is.All.EqualTo(HttpStatusCode.OK));
         }
 
         [Test]
