@@ -44,3 +44,18 @@ starts the `reinsurance-sql` container and the API applies the explicit EF6
 Useful endpoints include `/api/health`, `/api/submissions`, submission exposure and
 cat-model views, treaty pricing, treaty binding, and the guarded
 `POST /api/admin/reseed` operation.
+
+## Web UI
+
+The React/TypeScript workbench is under `web/` and uses Vite with a development
+proxy to the API on `http://localhost:5055`:
+
+```powershell
+cd web
+npm ci
+npm run dev
+```
+
+The frontend scripts are `dev`, `build`, `preview`, `test`, `lint`, `typecheck`,
+and `format`. Start the SQL container and API with the commands above before
+opening the UI at `http://localhost:5173`.
