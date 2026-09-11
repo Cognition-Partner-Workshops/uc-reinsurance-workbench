@@ -36,10 +36,12 @@ finite hit fraction and revise the endpoint evidence accordingly.
 
 # Loss-history incident: Sakura General burning cost
 
+Status: fixed (Sentry `BACKEND-REINSURANCE-DEMO-4`).
+
 ## Symptom
 
-The loss-history endpoint for Sakura General returns HTTP 500 with a
-`KeyNotFoundException`, while the same endpoint works for the other seeded
+The loss-history endpoint for Sakura General returned HTTP 500 with a
+`KeyNotFoundException`, while the same endpoint worked for the other seeded
 cedents.
 
 ## Reproduction
@@ -47,7 +49,9 @@ cedents.
 1. Start SQL Server with `tools/db-up.ps1` and seed the development database.
 2. Start the API with `tools/run-api.ps1`.
 3. Submit `GET /api/loss-history?cedentId=6`.
-4. Observe the HTTP 500 response and its `X-Trace-Id` header.
+4. Before the fix, observe the HTTP 500 response and its `X-Trace-Id` header.
+   After the fix, the request returns HTTP 200 with the 2026 loss included in
+   `burningCost` at its untrended (current cost level) value.
 
 The Sakura dataset includes a recent 2026 earthquake loss that is included in
 the five-year burning-cost window.
@@ -61,8 +65,16 @@ is corrected.
 ## Root cause
 
 Burning-cost calculation applies year-specific trend factors to every loss in
-the lookback window. The 2026 loss has no corresponding factor in the factor
-table, so dictionary lookup throws while calculating the trended total.
+the lookback window. The 2026 loss had no corresponding factor in the factor
+table, so the dictionary indexer threw while calculating the trended total.
+
+## Fix
+
+`LossHistoryService.TrendFactor` resolves the factor for a loss year and clamps
+years outside the table to the nearest tabulated year: losses after the latest
+factor year use the current-cost-level factor (`1.00`), and losses before the
+earliest factor year use the earliest factor. The `PlantedIncident` tests now
+pin the fixed behaviour (no exception, 2026 loss included at current cost level).
 
 # Workflow incident: declining a quoted submission
 
