@@ -130,21 +130,22 @@ describe("TreatyDetailScreen (planted incident)", () => {
         expect(screen.getByText("Exhaustion point")).toBeInTheDocument();
     });
 
-    it("throws when a treaty has no layers", () => {
-        vi.spyOn(console, "error").mockImplementation(() => {});
+    it("renders a placeholder exhaustion point when a treaty has no layers", () => {
+        renderTreaty({
+            id: 10,
+            name: "Quota Share Treaty",
+            type: 2,
+            status: 1,
+            currency: "USD",
+            submissionId: 1,
+            inceptionDate: "2026-01-01T00:00:00",
+            expiryDate: "2026-12-31T00:00:00",
+            layers: [],
+        });
 
-        expect(() =>
-            renderTreaty({
-                id: 10,
-                name: "Quota Share Treaty",
-                type: 2,
-                status: 1,
-                currency: "USD",
-                submissionId: 1,
-                inceptionDate: "2026-01-01T00:00:00",
-                expiryDate: "2026-12-31T00:00:00",
-                layers: [],
-            }),
-        ).toThrow(TypeError);
+        expect(screen.getByRole("heading", { name: "Quota Share Treaty" })).toBeInTheDocument();
+        const exhaustion = screen.getByText("Exhaustion point").closest(".stat-card");
+        expect(exhaustion).not.toBeNull();
+        expect(exhaustion!.querySelector("strong")).toHaveTextContent("—");
     });
 });

@@ -118,3 +118,9 @@ keep the treaty available for investigation without attempting a bind action.
 The seeded quota-share treaty has no treaty layers. The treaty detail summary
 derives its exhaustion point from the top layer without handling an empty layer
 collection, so rendering the summary accesses a missing layer.
+
+## Resolution
+
+`TreatyDetailScreen` now renders `—` for the exhaustion point when the treaty
+has no layers. `TreatyDetailScreen.test.tsx` pins the no-layer render as a
+regression test (Sentry `FRONTEND-REINSURANCE-DEMO-2`).
