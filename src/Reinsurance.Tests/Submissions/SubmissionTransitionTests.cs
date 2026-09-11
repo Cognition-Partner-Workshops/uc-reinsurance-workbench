@@ -1,5 +1,6 @@
 using System;
 using NUnit.Framework;
+using Reinsurance.Core.Domain.Pricing;
 using Reinsurance.Core.Domain.Submissions;
 using Reinsurance.Core.Exceptions;
 using Reinsurance.Services.Submissions;
@@ -61,7 +62,7 @@ namespace Reinsurance.Tests.Submissions
         public void CreateGeneratesYearlyReferences()
         {
             var repository = new FakeRepository<Submission>();
-            var service = new SubmissionService(repository, new EmptyExposureService());
+            var service = new SubmissionService(repository, new EmptyExposureService(), new FakeRepository<PricingResult>());
 
             var first = service.Create(new SubmissionCreateRequest
             {
@@ -82,7 +83,10 @@ namespace Reinsurance.Tests.Submissions
 
         private static SubmissionService Service(Submission submission)
         {
-            return new SubmissionService(new FakeRepository<Submission>(new[] { submission }), new EmptyExposureService());
+            return new SubmissionService(
+                new FakeRepository<Submission>(new[] { submission }),
+                new EmptyExposureService(),
+                new FakeRepository<PricingResult>());
         }
     }
 }

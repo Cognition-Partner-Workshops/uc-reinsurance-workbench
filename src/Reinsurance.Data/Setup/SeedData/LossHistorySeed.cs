@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Reinsurance.Core.Domain.Exposure;
 
 namespace Reinsurance.Data.Setup.SeedData
@@ -26,6 +27,19 @@ namespace Reinsurance.Data.Setup.SeedData
                     });
                 }
             }
+            var japanCedent = state.Cedents.Single(x => x.Country == "JP");
+            var japanRegion = state.Regions.Single(x => x.Code == "JP");
+            var earthquake = state.Perils.Single(x => x.Code == "EQ");
+            losses.Add(new LossEvent
+            {
+                CedentId = japanCedent.Id,
+                RegionId = japanRegion.Id,
+                PerilId = earthquake.Id,
+                EventName = "Hyuga-nada EQ 2026",
+                LossDate = new DateTime(2026, 3, 2),
+                GroundUpLoss = 4250000m,
+                CededLoss = 900000m
+            });
             context.Set<LossEvent>().AddRange(losses);
             context.SaveChanges();
         }

@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using Reinsurance.Core;
 using Reinsurance.Core.Data;
+using Reinsurance.Core.Domain.Pricing;
 using Reinsurance.Core.Domain.Submissions;
 using Reinsurance.Core.Exceptions;
 using Reinsurance.Core.Infrastructure;
@@ -18,13 +19,19 @@ namespace Reinsurance.Services.Submissions
     {
         private readonly IRepository<Submission> _repository;
         private readonly IExposureService _exposureService;
+        private readonly IRepository<PricingResult> _pricingResults;
 
-        public SubmissionService(IRepository<Submission> repository, IExposureService exposureService)
+        public SubmissionService(
+            IRepository<Submission> repository,
+            IExposureService exposureService,
+            IRepository<PricingResult> pricingResults)
         {
             Guard.NotNull(repository, nameof(repository));
             Guard.NotNull(exposureService, nameof(exposureService));
+            Guard.NotNull(pricingResults, nameof(pricingResults));
             _repository = repository;
             _exposureService = exposureService;
+            _pricingResults = pricingResults;
         }
 
         public virtual SubmissionModel GetById(int submissionId)
@@ -89,6 +96,18 @@ namespace Reinsurance.Services.Submissions
                 throw new EntityNotFoundException(nameof(Submission), submissionId);
             if (!CanTransition(entity.Status, status))
                 throw new InvalidSubmissionTransitionException(entity.Status, status);
+            if (status == SubmissionStatus.Declined)
+            {
+                var layerIds = entity.Treaties.SelectMany(x => x.Layers).Select(x => x.Id).ToList();
+                var lastQuotedOn = _pricingResults.Table
+                    .Where(x => layerIds.Contains(x.TreatyLayerId))
+                    .Max(x => x.CalculatedOn);
+                entity.Notes = string.Format(
+                    "{0} Declined {1:yyyy-MM-dd}; last quote {2:yyyy-MM-dd}.",
+                    entity.Notes,
+                    DateTime.UtcNow,
+                    lastQuotedOn).Trim();
+            }
             entity.Status = status;
             _repository.Update(entity);
             return GetById(submissionId);
