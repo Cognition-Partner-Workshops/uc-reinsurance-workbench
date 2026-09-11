@@ -1,12 +1,15 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.Core.Objects;
+using System.Runtime.Serialization;
 
 namespace Reinsurance.Core
 {
+    [DataContract]
     public abstract class BaseEntity : IEquatable<BaseEntity>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [DataMember]
         public int Id { get; set; }
 
         public virtual string GetEntityName()

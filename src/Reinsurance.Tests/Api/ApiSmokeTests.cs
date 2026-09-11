@@ -53,6 +53,8 @@ namespace Reinsurance.Tests.Api
             var references = Regex.Matches(body, "SUB-2026-\\d{4}");
 
             Assert.That(references.Count, Is.GreaterThanOrEqualTo(10));
+            Assert.That(body, Does.Contain("\"id\":"));
+            Assert.That(body, Does.Contain("\"cedentName\":"));
         }
 
         [Test]

@@ -33,7 +33,7 @@ namespace Reinsurance.Services.Submissions
             return entity == null ? null : ToModel(entity);
         }
 
-        public virtual IPagedList<Submission> Search(SubmissionSearchQuery query)
+        public virtual IPagedList<SubmissionListItemModel> Search(SubmissionSearchQuery query)
         {
             Guard.NotNull(query, nameof(query));
             var pageIndex = Math.Max(0, query.PageIndex);
@@ -50,7 +50,8 @@ namespace Reinsurance.Services.Submissions
                 source = source.Where(x => x.CedentId == query.CedentId.Value);
             var total = source.Count();
             var records = source.OrderByDescending(x => x.Id).Skip(pageIndex * pageSize).Take(pageSize).ToList();
-            return new PagedList<Submission>(records, pageIndex, pageSize, total);
+            var models = records.Select(ToListItemModel).ToList();
+            return new PagedList<SubmissionListItemModel>(models, pageIndex, pageSize, total);
         }
 
         public virtual SubmissionModel Create(SubmissionCreateRequest request)
@@ -140,9 +141,10 @@ namespace Reinsurance.Services.Submissions
                 Id = entity.Id,
                 Reference = entity.Reference,
                 CedentId = entity.CedentId,
-                Cedent = entity.Cedent == null ? null : entity.Cedent.Name,
-                Broker = entity.Broker == null ? null : entity.Broker.Name,
-                Underwriter = entity.Underwriter == null ? null : entity.Underwriter.Name,
+                CedentName = entity.Cedent == null ? null : entity.Cedent.Name,
+                CedentRating = entity.Cedent == null ? null : entity.Cedent.Rating,
+                BrokerName = entity.Broker == null ? null : entity.Broker.Name,
+                UnderwriterName = entity.Underwriter == null ? null : entity.Underwriter.Name,
                 Status = entity.Status,
                 ReceivedOn = entity.ReceivedOn,
                 InceptionDate = entity.InceptionDate,
@@ -170,6 +172,25 @@ namespace Reinsurance.Services.Submissions
                         Currency = y.Currency
                     }).ToList()
                 }).ToList()
+            };
+        }
+
+        private static SubmissionListItemModel ToListItemModel(Submission entity)
+        {
+            return new SubmissionListItemModel
+            {
+                Id = entity.Id,
+                Reference = entity.Reference,
+                Status = entity.Status,
+                CedentId = entity.CedentId,
+                CedentName = entity.Cedent == null ? null : entity.Cedent.Name,
+                CedentRating = entity.Cedent == null ? null : entity.Cedent.Rating,
+                BrokerName = entity.Broker == null ? null : entity.Broker.Name,
+                UnderwriterName = entity.Underwriter == null ? null : entity.Underwriter.Name,
+                ReceivedOn = entity.ReceivedOn,
+                InceptionDate = entity.InceptionDate,
+                ExpiryDate = entity.ExpiryDate,
+                TreatyCount = entity.Treaties.Count
             };
         }
     }

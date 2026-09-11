@@ -8,7 +8,11 @@ namespace Reinsurance.Api.Controllers
     [RoutePrefix("api/health")]
     public sealed class HealthController : ApiController
     {
-        [HttpGet, Route("")]
+        [HttpGet]
+        [Route("")]
+        /// <summary>
+        /// Checks API and database health.
+        /// </summary>
         public IHttpActionResult Get()
         {
             var db = "ok";

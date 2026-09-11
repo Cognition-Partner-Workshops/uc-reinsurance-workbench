@@ -8,7 +8,7 @@ namespace Reinsurance.Services.Submissions
     public partial interface ISubmissionService
     {
         SubmissionModel GetById(int submissionId);
-        IPagedList<Submission> Search(SubmissionSearchQuery query);
+        IPagedList<SubmissionListItemModel> Search(SubmissionSearchQuery query);
         SubmissionModel Create(SubmissionCreateRequest request);
         SubmissionModel Transition(int submissionId, SubmissionStatus status);
         void SoftDelete(int submissionId);

@@ -12,7 +12,11 @@ namespace Reinsurance.Api.Controllers
     [RoutePrefix("api/admin")]
     public sealed class AdminController : ApiController
     {
-        [HttpPost, Route("reseed")]
+        [HttpPost]
+        [Route("reseed")]
+        /// <summary>
+        /// Recreates the deterministic demonstration data.
+        /// </summary>
         public IHttpActionResult Reseed()
         {
             var expected = Environment.GetEnvironmentVariable("REINSURANCE_ADMIN_KEY") ?? "dev-admin";
