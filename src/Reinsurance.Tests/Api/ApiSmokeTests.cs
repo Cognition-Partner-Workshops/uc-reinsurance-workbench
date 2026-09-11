@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Reinsurance.Tests.Api
@@ -85,6 +87,29 @@ namespace Reinsurance.Tests.Api
             Assert.That(authorities.Count, Is.EqualTo(4));
             foreach (Match authority in authorities)
                 Assert.That(decimal.Parse(authority.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture), Is.GreaterThan(0m));
+        }
+
+        [Test]
+        public void ConcurrentRequestsFromUnseenUserAgentsReturnJson()
+        {
+            var paths = new[] { "/api/reference/underwriters", "/api/submissions?pageSize=100" };
+            var tasks = new List<Task<HttpResponseMessage>>();
+            for (var i = 0; i < 24; i++)
+            {
+                var request = new HttpRequestMessage(HttpMethod.Get, paths[i % paths.Length]);
+                request.Headers.UserAgent.ParseAdd(
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Workbench/" + Guid.NewGuid().ToString("N")
+                    + " Chrome/142.0.0.0 Electron/42.2.0 Safari/537.36");
+                tasks.Add(_client.SendAsync(request));
+            }
+
+            var responses = Task.WhenAll(tasks).GetAwaiter().GetResult();
+
+            foreach (var response in responses)
+            {
+                Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK), response.RequestMessage.RequestUri.PathAndQuery);
+                Assert.That(response.Content.Headers.ContentType.MediaType, Is.EqualTo("application/json"));
+            }
         }
 
         [Test]
