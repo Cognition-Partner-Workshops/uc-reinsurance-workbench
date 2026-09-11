@@ -1,4 +1,5 @@
 FROM mono:6.12 AS build
+ENV MONO_ENV_OPTIONS=--interp
 
 # The official Mono image is amd64-only; arm64 hosts must use platform: linux/amd64.
 WORKDIR /src
@@ -11,6 +12,7 @@ RUN nuget restore Reinsurance.Core/packages.config -PackagesDirectory /src/packa
     && msbuild Reinsurance.Api/Reinsurance.Api.csproj /p:Configuration=Release /v:minimal
 
 FROM mono:6.12-slim
+ENV MONO_ENV_OPTIONS=--interp
 
 RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list \
     && apt-get -o Acquire::Check-Valid-Until=false update \
