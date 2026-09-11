@@ -13,6 +13,7 @@ namespace Reinsurance.Api
         public override void OnException(HttpActionExecutedContext actionExecutedContext)
         {
             var exception = actionExecutedContext.Exception;
+            if (exception is OperationCanceledException) return;
             var traceId = Guid.NewGuid().ToString("N");
             var status = exception is EntityNotFoundException
                 ? HttpStatusCode.NotFound
