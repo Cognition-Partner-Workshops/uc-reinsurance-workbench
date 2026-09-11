@@ -10,6 +10,18 @@ namespace Reinsurance.Services.LossHistory
 {
     public partial class LossHistoryService : ILossHistoryService
     {
+        private static readonly IDictionary<int, decimal> TrendFactors = new Dictionary<int, decimal>
+        {
+            { 2018, 1.42m },
+            { 2019, 1.35m },
+            { 2020, 1.28m },
+            { 2021, 1.21m },
+            { 2022, 1.15m },
+            { 2023, 1.10m },
+            { 2024, 1.05m },
+            { 2025, 1.00m }
+        };
+
         private readonly IRepository<LossEvent> _repository;
 
         public LossHistoryService(IRepository<LossEvent> repository)
@@ -37,9 +49,9 @@ namespace Reinsurance.Services.LossHistory
             if (years <= 0)
                 throw new ArgumentOutOfRangeException(nameof(years));
             var start = DateTime.UtcNow.AddYears(-years);
-            var total = _repository.Table.Where(x => x.CedentId == cedentId && x.LossDate >= start)
-                .Select(x => (decimal?)x.GroundUpLoss).Sum() ?? 0m;
-            return total / years;
+            var losses = _repository.Table.Where(x => x.CedentId == cedentId && x.LossDate >= start).ToList();
+            var trended = losses.Sum(x => x.GroundUpLoss * TrendFactors[x.LossDate.Year]);
+            return trended / years;
         }
     }
 }

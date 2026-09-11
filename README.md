@@ -48,6 +48,18 @@ cat-model views, treaty pricing, treaty binding, and the guarded
 Sentry setup, environment variables, trace correlation, reproduction steps, and
 the Devin webhook workflow are documented in [docs/SENTRY.md](docs/SENTRY.md).
 
+## CI
+
+`.github/workflows/ci.yml` runs on every pull request and on pushes to `main`:
+
+- `backend` (`windows-latest`): NuGet restore, MSBuild of `src/ReinsuranceWorkbench.sln`
+  (Debug), and the NUnit unit run with `TestCategory!=Integration` — the same filter
+  `tools\test.ps1` uses without `-Integration`, so `PlantedIncident` tests are included.
+- `web` (`ubuntu-latest`): Node 20, `npm ci`, `npm run lint`, `npm run typecheck`, `npm test`.
+
+Integration tests need SQL Server and IIS Express and remain local-only via
+`tools\test.ps1 -Integration`.
+
 ## Web UI
 
 The React/TypeScript workbench is under `web/` and uses Vite with a development
