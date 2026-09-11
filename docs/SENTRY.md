@@ -51,8 +51,9 @@ Backend Atlas error:
 Invoke-WebRequest -Method Post http://localhost:5055/api/treaties/3/price
 ```
 
-This exercises the planted Atlas pricing failure and should produce a backend
-Sentry issue when `SENTRY_DSN` is configured.
+This exercised the planted Atlas pricing failure (`BACKEND-REINSURANCE-DEMO-1`).
+Since the `LayerHitFraction` fix it returns HTTP 200 and no longer produces a
+backend Sentry event; see [docs/INCIDENTS.md](INCIDENTS.md).
 
 Frontend Atlas error:
 
@@ -60,8 +61,9 @@ Frontend Atlas error:
 2. Select layer 3.
 3. Click **Save quote**.
 
-The API returns the planted 500 response; the frontend displays the trace ID and
-captures the server error.
+Before the fix the API returned the planted 500 response and the frontend
+displayed the trace ID and captured the server error; the quote now saves
+successfully.
 
 ## Webhook path to Devin
 
