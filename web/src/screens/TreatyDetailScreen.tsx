@@ -33,7 +33,7 @@ export default function TreatyDetailScreen() {
     }
 
     const item = treaty.data;
-    const topLayer = item.layers[item.layers.length - 1]!;
+    const topLayer = item.layers[item.layers.length - 1];
     const placement = submission.data;
     const cat =
         (model.data ?? []).find((row) => row.regionId == null && row.perilId == null) ??
@@ -79,7 +79,10 @@ export default function TreatyDetailScreen() {
             <div className="stats-grid">
                 {[
                     ["Total limit", fmtM(totalLimit)],
-                    ["Exhaustion point", fmtM(topLayer.attachment + topLayer.limit)],
+                    [
+                        "Exhaustion point",
+                        topLayer ? fmtM(topLayer.attachment + topLayer.limit) : "—",
+                    ],
                     ["Technical premium", totalPremium === undefined ? "—" : fmtM(totalPremium)],
                     ["Expected loss", fmtM(totalLoss)],
                     ["Modeled PML 250", cat ? fmtM(cat.pmL250) : "-"],
