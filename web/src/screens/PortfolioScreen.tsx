@@ -68,7 +68,7 @@ export default function PortfolioScreen({
             (models.get(submission.id) ?? []).find(
                 (row) => row.regionId == null && row.perilId == null,
             ) ?? models.get(submission.id)?.[0];
-        return sum + (result?.pml250 ?? 0);
+        return sum + (result?.pmL250 ?? 0);
     }, 0);
     const maxExpiry = bound.reduce<string | undefined>(
         (max, item) => (!max || item.treaty.expiryDate > max ? item.treaty.expiryDate : max),
@@ -185,7 +185,7 @@ export default function PortfolioScreen({
                                           ? "—"
                                           : fmtM(premium)}
                                 </span>
-                                <span>{model ? fmtM(model.pml250) : "—"}</span>
+                                <span>{model ? fmtM(model.pmL250) : "-"}</span>
                                 <StatusPill status={treaty.status} treaty />
                             </button>
                         );

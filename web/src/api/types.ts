@@ -113,9 +113,9 @@ export interface CatModelResultModel {
     modelVersion: string;
     aal: number;
     expectedLoss: number;
-    pml50: number;
-    pml100: number;
-    pml250: number;
+    pmL50: number;
+    pmL100: number;
+    pmL250: number;
     runOn: string;
 }
 
@@ -139,10 +139,13 @@ export interface ExposureSummary {
 
 export interface ExposureRecordModel {
     id: number;
-    regionId: number;
-    perilId: number;
-    tiv: number;
-    occupancy: string;
+    regionCode: string;
+    regionName: string;
+    perilCode: string;
+    perilName: string;
+    totalInsuredValue: number;
+    riskCount: number;
+    averageDeductiblePct: number;
 }
 
 export interface CedentModel {

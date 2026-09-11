@@ -23,7 +23,7 @@ export function priceLayer(
     layer: TreatyLayerModel,
     model: CatModelResultModel,
 ): ClientPricingResult {
-    if (model.pml250 <= 0) {
+    if (model.pmL250 <= 0) {
         return {
             error: false,
             expectedLoss: 0,
@@ -36,7 +36,7 @@ export function priceLayer(
             profitMarginPct: 0,
         };
     }
-    const denominator = model.pml250 - layer.attachment;
+    const denominator = model.pmL250 - layer.attachment;
     if (denominator === 0) {
         return {
             error: true,
@@ -51,7 +51,7 @@ export function priceLayer(
         };
     }
     const hit =
-        clamp((model.pml250 - layer.attachment) / model.pml250, 0, 1) *
+        clamp((model.pmL250 - layer.attachment) / model.pmL250, 0, 1) *
         clamp(layer.limit / denominator, 0, 1);
     const elRaw = model.aal * hit;
     const riskLoad = round(0.15 * Math.sqrt(elRaw * layer.limit), 2);

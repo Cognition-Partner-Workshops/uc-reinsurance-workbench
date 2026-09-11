@@ -202,7 +202,7 @@ export default function PricingScreen() {
                             Portfolio AAL <strong>{fmtM(model.aal)}</strong>
                         </span>
                         <span>
-                            PML 250 <strong>{fmtM(model.pml250)}</strong>
+                            PML 250 <strong>{fmtM(model.pmL250)}</strong>
                         </span>
                         <span>
                             Model{" "}

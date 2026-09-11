@@ -81,7 +81,7 @@ export default function TreatyDetailScreen() {
                     ["Attachment (L1)", fmtM(item.layers[0]?.attachment ?? 0)],
                     ["Technical premium", totalPremium === undefined ? "—" : fmtM(totalPremium)],
                     ["Expected loss", fmtM(totalLoss)],
-                    ["Modeled PML 250", cat ? fmtM(cat.pml250) : "—"],
+                    ["Modeled PML 250", cat ? fmtM(cat.pmL250) : "-"],
                 ].map(([label, value]) => (
                     <div className="card stat-card" key={label}>
                         <div className="muted">{label}</div>
@@ -141,7 +141,7 @@ export default function TreatyDetailScreen() {
                             <dt>PML 50 / 100 / 250</dt>
                             <dd>
                                 {cat
-                                    ? `${fmtM(cat.pml50)} / ${fmtM(cat.pml100)} / ${fmtM(cat.pml250)}`
+                                    ? `${fmtM(cat.pmL50)} / ${fmtM(cat.pmL100)} / ${fmtM(cat.pmL250)}`
                                     : "—"}
                             </dd>
                         </dl>
