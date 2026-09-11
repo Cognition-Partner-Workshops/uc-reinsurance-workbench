@@ -45,6 +45,9 @@ Useful endpoints include `/api/health`, `/api/submissions`, submission exposure 
 cat-model views, treaty pricing, treaty binding, and the guarded
 `POST /api/admin/reseed` operation.
 
+Sentry setup, environment variables, trace correlation, reproduction steps, and
+the Devin webhook workflow are documented in [docs/SENTRY.md](docs/SENTRY.md).
+
 ## Web UI
 
 The React/TypeScript workbench is under `web/` and uses Vite with a development

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as Sentry from "@sentry/react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import PortfolioScreen from "./screens/PortfolioScreen";
@@ -7,12 +8,14 @@ import SubmissionDetailScreen from "./screens/SubmissionDetailScreen";
 import TreatyDetailScreen from "./screens/TreatyDetailScreen";
 import PricingScreen from "./screens/PricingScreen";
 
+const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
+
 export default function App() {
     const [lastTreatyId, setLastTreatyId] = useState<number>();
     const rememberTreaty = (id: number) => setLastTreatyId(id);
     return (
         <Layout lastTreatyId={lastTreatyId}>
-            <Routes>
+            <SentryRoutes>
                 <Route
                     path="/"
                     element={
@@ -24,7 +27,7 @@ export default function App() {
                 <Route path="/treaties/:id" element={<TreatyDetailScreen />} />
                 <Route path="/treaties/:id/pricing" element={<PricingScreen />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            </SentryRoutes>
         </Layout>
     );
 }

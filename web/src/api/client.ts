@@ -1,3 +1,6 @@
+import * as Sentry from "@sentry/react";
+import { sentryEnabled } from "../sentry";
+
 export class ApiError extends Error {
     readonly status: number;
     readonly traceId?: string;
@@ -27,13 +30,24 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
     }
     if (!response.ok) {
         const data = body as { message?: string; detail?: string; traceId?: string } | null;
-        throw new ApiError(
+        const traceId = response.headers.get("X-Trace-Id") ?? data?.traceId;
+        const error = new ApiError(
             response.status,
             data?.message ??
                 data?.detail ??
                 (typeof body === "string" ? body : response.statusText),
-            data?.traceId,
+            traceId,
         );
+        if (response.status >= 500 && sentryEnabled) {
+            Sentry.captureException(error, {
+                tags: {
+                    traceId: traceId ?? "unknown",
+                    apiPath: path,
+                    httpStatus: String(response.status),
+                },
+            });
+        }
+        throw error;
     }
     return body as T;
 }
