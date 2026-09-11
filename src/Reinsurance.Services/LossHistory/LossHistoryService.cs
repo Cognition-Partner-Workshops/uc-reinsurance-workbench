@@ -22,6 +22,9 @@ namespace Reinsurance.Services.LossHistory
             { 2025, 1.00m }
         };
 
+        private static readonly int EarliestTrendYear = TrendFactors.Keys.Min();
+        private static readonly int LatestTrendYear = TrendFactors.Keys.Max();
+
         private readonly IRepository<LossEvent> _repository;
 
         public LossHistoryService(IRepository<LossEvent> repository)
@@ -50,8 +53,20 @@ namespace Reinsurance.Services.LossHistory
                 throw new ArgumentOutOfRangeException(nameof(years));
             var start = DateTime.UtcNow.AddYears(-years);
             var losses = _repository.Table.Where(x => x.CedentId == cedentId && x.LossDate >= start).ToList();
-            var trended = losses.Sum(x => x.GroundUpLoss * TrendFactors[x.LossDate.Year]);
+            var trended = losses.Sum(x => x.GroundUpLoss * TrendFactor(x.LossDate.Year));
             return trended / years;
+        }
+
+        /// <summary>
+        /// Returns the on-level trend factor for a loss year, clamping years outside the
+        /// factor table to the nearest tabulated year.
+        /// </summary>
+        public static decimal TrendFactor(int lossYear)
+        {
+            decimal factor;
+            if (TrendFactors.TryGetValue(lossYear, out factor))
+                return factor;
+            return TrendFactors[Math.Min(Math.Max(lossYear, EarliestTrendYear), LatestTrendYear)];
         }
     }
 }
