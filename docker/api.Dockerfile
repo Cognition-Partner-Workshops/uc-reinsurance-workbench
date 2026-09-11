@@ -10,7 +10,7 @@ RUN nuget restore Reinsurance.Core/packages.config -PackagesDirectory /src/packa
     && nuget restore Reinsurance.Api/packages.config -PackagesDirectory /src/packages \
     && msbuild Reinsurance.Api/Reinsurance.Api.csproj /p:Configuration=Release /v:minimal
 
-FROM mono:6.12
+FROM mono:6.12-slim
 
 RUN sed -i 's|deb.debian.org|archive.debian.org|g' /etc/apt/sources.list \
     && apt-get -o Acquire::Check-Valid-Until=false update \
