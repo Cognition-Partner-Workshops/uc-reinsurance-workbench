@@ -137,6 +137,13 @@ export interface ExposureSummary {
     riskCount: number;
 }
 
+export interface PortfolioModel {
+    submissions: SubmissionModel[];
+    treatyPricing: { treatyId: number; results: PricingResultModel[] }[];
+    catModels: { submissionId: number; results: CatModelResultModel[] }[];
+    exposures: { submissionId: number; summary: ExposureSummary }[];
+}
+
 export interface ExposureRecordModel {
     id: number;
     regionCode: string;

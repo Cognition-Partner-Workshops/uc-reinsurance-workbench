@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { usePortfolio } from "../api/queries";
+import type { CatModelResultModel, PricingResultModel } from "../api/types";
 import { TreatyStatus, TreatyType, treatyTypeLabels } from "../api/types";
 import { fmtDate, fmtM } from "../domain/format";
 import { ErrorBanner, EmptyState, PageHeader, Skeleton, StatusPill } from "../components/Ui";
@@ -15,17 +16,16 @@ export default function PortfolioScreen({
     const [line, setLine] = useState<"property" | "all">("property");
     const portfolio = usePortfolio();
     const navigate = useNavigate();
+    const submissions = portfolio.data?.submissions;
     useEffect(() => {
-        if (lastTreatyId || portfolio.isLoading || portfolio.error) {
+        if (lastTreatyId || !submissions) {
             return;
         }
-        const firstTreaty = portfolio.detailItems
-            .flatMap((submission) => submission.treaties)
-            .find(Boolean);
+        const firstTreaty = submissions.flatMap((submission) => submission.treaties).find(Boolean);
         if (firstTreaty) {
             onTreaty(firstTreaty.id);
         }
-    }, [lastTreatyId, onTreaty, portfolio.detailItems, portfolio.error, portfolio.isLoading]);
+    }, [lastTreatyId, onTreaty, submissions]);
     if (portfolio.isLoading) {
         return (
             <>
@@ -38,20 +38,18 @@ export default function PortfolioScreen({
             </>
         );
     }
-    if (portfolio.error) return <ErrorBanner error={portfolio.error} />;
-    const details = portfolio.detailItems;
+    if (portfolio.error || !portfolio.data) return <ErrorBanner error={portfolio.error} />;
+    const details = portfolio.data.submissions;
     const treaties = details
         .flatMap((submission) => submission.treaties.map((treaty) => ({ submission, treaty })))
         .filter(({ treaty }) => line === "all" || treaty.type === TreatyType.PropertyCatXoL);
-    const pricingByTreaty = new Map<number, (typeof portfolio.treatyPricing)[number]["data"]>();
-    portfolio.treatyIds.forEach((id, index) =>
-        pricingByTreaty.set(id, portfolio.treatyPricing[index]?.data),
+    const pricingByTreaty = new Map<number, PricingResultModel[]>(
+        portfolio.data.treatyPricing.map((row) => [row.treatyId, row.results]),
     );
-    const models = new Map<number, (typeof portfolio.catModels)[number]["data"]>();
-    details.forEach((submission, index) =>
-        models.set(submission.id, portfolio.catModels[index]?.data),
+    const models = new Map<number, CatModelResultModel[]>(
+        portfolio.data.catModels.map((row) => [row.submissionId, row.results]),
     );
-    const exposures = portfolio.exposures.map((query) => query.data?.summary).filter(Boolean);
+    const exposures = portfolio.data.exposures.map((row) => row.summary);
     const bound = treaties.filter(({ treaty }) => treaty.status === TreatyStatus.Bound);
     const pricedNonBound = treaties.filter(({ treaty }) => treaty.status !== TreatyStatus.Bound);
     const sumPremium = (items: typeof treaties) =>

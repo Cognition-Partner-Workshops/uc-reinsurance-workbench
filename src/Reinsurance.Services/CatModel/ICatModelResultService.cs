@@ -7,5 +7,6 @@ namespace Reinsurance.Services.CatModel
     {
         CatModelResult GetLatestPortfolioResult(int submissionId);
         IList<CatModelResult> GetAll(int submissionId);
+        IList<CatModelResult> GetAll(IEnumerable<int> submissionIds);
     }
 }
