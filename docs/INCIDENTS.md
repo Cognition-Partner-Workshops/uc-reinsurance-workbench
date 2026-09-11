@@ -66,18 +66,22 @@ table, so dictionary lookup throws while calculating the trended total.
 
 # Workflow incident: declining a quoted submission
 
+Status: fixed (Sentry `BACKEND-REINSURANCE-DEMO-3`).
+
 ## Symptom
 
-Declining a quoted submission returns HTTP 500 instead of transitioning it to
-Declined. The submission remains Quoted.
+Declining a quoted submission returned HTTP 500 instead of transitioning it to
+Declined. The submission remained Quoted.
 
 ## Reproduction
 
 1. Start SQL Server with `tools/db-up.ps1` and start the API.
 2. Submit `POST /api/submissions/6/transition` with
    `{"status":4}`.
-3. Observe the HTTP 500 response.
-4. Submit `GET /api/submissions/6` and confirm the status is still Quoted.
+3. Before the fix, observe the HTTP 500 response; after the fix the request
+   returns HTTP 200 with `status` Declined.
+4. Submit `GET /api/submissions/6` and confirm the status (Quoted before the
+   fix, Declined after it).
 
 The same flow can be exercised in the UI at
 `Submissions → SUB-2026-0006 → Transition → Declined`.
@@ -91,8 +95,18 @@ route the workflow failure for review rather than recording a partial decline.
 
 Decline handling looks up the latest pricing result for the submission's treaty
 layers before updating the entity. The seeded Quoted submission has no pricing
-result rows, so taking the maximum calculation date from the empty sequence
-throws an `InvalidOperationException`.
+result rows, so `Max(x => x.CalculatedOn)` over the empty set threw an
+`InvalidOperationException`: against SQL Server, EF6 translated it to
+`SELECT MAX(CalculatedOn)`, which returns `NULL`, and failed to materialize that
+into the non-nullable `DateTime` ("The cast to value type 'System.DateTime'
+failed because the materialized value is null").
+
+## Fix
+
+`SubmissionService.Transition` now projects the maximum as `DateTime?`, so an
+empty result yields `null` instead of throwing, and the decline note records
+`no quote on record` when no pricing result exists. The `PlantedIncident` tests
+now pin the fixed behaviour (decline succeeds with and without pricing results).
 
 # UI incident: quota-share treaty detail
 

@@ -101,12 +101,14 @@ namespace Reinsurance.Services.Submissions
                 var layerIds = entity.Treaties.SelectMany(x => x.Layers).Select(x => x.Id).ToList();
                 var lastQuotedOn = _pricingResults.Table
                     .Where(x => layerIds.Contains(x.TreatyLayerId))
-                    .Max(x => x.CalculatedOn);
+                    .Max(x => (DateTime?)x.CalculatedOn);
                 entity.Notes = string.Format(
-                    "{0} Declined {1:yyyy-MM-dd}; last quote {2:yyyy-MM-dd}.",
+                    "{0} Declined {1:yyyy-MM-dd}; {2}.",
                     entity.Notes,
                     DateTime.UtcNow,
-                    lastQuotedOn).Trim();
+                    lastQuotedOn.HasValue
+                        ? string.Format("last quote {0:yyyy-MM-dd}", lastQuotedOn.Value)
+                        : "no quote on record").Trim();
             }
             entity.Status = status;
             _repository.Update(entity);
