@@ -1,25 +1,46 @@
-# Deprecation warning :warning:
+# Reinsurance Workbench
 
-This repository is outdated and no longer being actively maintained by the Smartstore devs. 
-Users & developers are encouraged to check out the successor built on **ASP.NET Core**:
-<a href="https://github.com/smartstore/Smartstore">**Smartstore 5**</a>.
+Classic ASP.NET MVC/Web API 2 reinsurance workbench targeting .NET Framework 4.7.2.
 
-<p>
-	<a href="https://github.com/smartstore/Smartstore">
-		<img src="assets/ready.set.go.jpg" alt="Announcing Smartstore 5">
-	</a>
-</p>
+The solution is intentionally structured like a SmartStore-style legacy application:
+domain entities and EF mappings are split by business area, repositories and save hooks
+sit below the services layer, and the MVC/Web API host composes the cross-cutting
+dependencies with Autofac.
 
-### System requirements
+## Local workflow
 
-* IIS 7+
-* ASP.NET 4.5+
-* MS SQL Server 2008 Express (or higher) OR MS SQL Server Compact 4
-* Visual C++ Redistributable für Visual Studio 2015-2019 ([Download](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads))
-* Full Trust
+```powershell
+tools\db-up.ps1
+tools\build.ps1
+tools\test.ps1
+tools\run-api.ps1
+```
 
+By default, `tools\test.ps1` runs unit and planted-incident tests while excluding
+the integration category:
 
+```powershell
+.\tools\test.ps1
+```
 
-## License
+Run the integration suite against the running API with:
 
-Smartstore Community Edition is released under the [GPLv3 license](http://www.gnu.org/licenses/gpl-3.0.txt).
+```powershell
+.\tools\test.ps1 -Integration
+```
+
+To pass a VSTest filter explicitly, use `-Filter`:
+
+```powershell
+.\tools\test.ps1 -Filter "TestCategory=PlantedIncident"
+```
+
+The development SQL Server password and connection string are intentionally local-only defaults. Set `REINSURANCE_DB` or `MSSQL_SA_PASSWORD` to override them.
+
+The default local database is SQL Server on `localhost,14330`. `tools/db-up.ps1`
+starts the `reinsurance-sql` container and the API applies the explicit EF6
+`InitialCreate` migration before deterministic demo data is seeded.
+
+Useful endpoints include `/api/health`, `/api/submissions`, submission exposure and
+cat-model views, treaty pricing, treaty binding, and the guarded
+`POST /api/admin/reseed` operation.
