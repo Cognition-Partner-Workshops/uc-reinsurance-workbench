@@ -45,6 +45,10 @@ include the API path and HTTP status.
 
 ## Reproducing test events
 
+The Atlas pricing failure described below has been fixed (see
+`docs/INCIDENTS.md`); the request now returns HTTP 200 and no Sentry event.
+The steps are kept as the historical reproduction of the planted incident.
+
 Backend Atlas error:
 
 ```powershell
