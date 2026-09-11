@@ -49,7 +49,7 @@ describe("SubmissionDetailScreen", () => {
         );
 
         const select = await screen.findByRole("combobox");
-        await userEvent.selectOptions(select, "4");
+        await userEvent.selectOptions(select, "5");
         await userEvent.click(screen.getByRole("button", { name: "Transition" }));
 
         await waitFor(() => {
@@ -57,7 +57,7 @@ describe("SubmissionDetailScreen", () => {
                 "/api/submissions/1/transition",
                 expect.objectContaining({
                     method: "POST",
-                    body: JSON.stringify({ status: 4 }),
+                    body: JSON.stringify({ status: 5 }),
                 }),
             );
         });
