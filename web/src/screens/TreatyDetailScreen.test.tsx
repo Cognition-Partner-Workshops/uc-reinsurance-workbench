@@ -79,7 +79,9 @@ describe("TreatyDetailScreen (planted incident)", () => {
                     return Promise.resolve(new Response(JSON.stringify({}), { status: 200 }));
                 }
                 if (path === "/api/submissions/1") {
-                    return Promise.resolve(new Response(JSON.stringify(submission), { status: 200 }));
+                    return Promise.resolve(
+                        new Response(JSON.stringify(submission), { status: 200 }),
+                    );
                 }
                 if (path === "/api/submissions/1/cat-model") {
                     return Promise.resolve(new Response(JSON.stringify(catModel), { status: 200 }));
@@ -130,21 +132,25 @@ describe("TreatyDetailScreen (planted incident)", () => {
         expect(screen.getByText("Exhaustion point")).toBeInTheDocument();
     });
 
-    it("throws when a treaty has no layers", () => {
-        vi.spyOn(console, "error").mockImplementation(() => {});
+    it("renders a treaty with no layers without an exhaustion point", () => {
+        renderTreaty({
+            id: 10,
+            name: "Quota Share Treaty",
+            type: 2,
+            status: 1,
+            currency: "USD",
+            submissionId: 1,
+            inceptionDate: "2026-01-01T00:00:00",
+            expiryDate: "2026-12-31T00:00:00",
+            layers: [],
+        });
 
-        expect(() =>
-            renderTreaty({
-                id: 10,
-                name: "Quota Share Treaty",
-                type: 2,
-                status: 1,
-                currency: "USD",
-                submissionId: 1,
-                inceptionDate: "2026-01-01T00:00:00",
-                expiryDate: "2026-12-31T00:00:00",
-                layers: [],
-            }),
-        ).toThrow(TypeError);
+        expect(screen.getByRole("heading", { name: "Quota Share Treaty" })).toBeInTheDocument();
+        const exhaustion = screen.getByText("Exhaustion point").closest(".stat-card");
+        expect(exhaustion).not.toBeNull();
+        expect(exhaustion!.querySelector("strong")).toHaveTextContent("—");
+        expect(
+            screen.getByText("Total limit").closest(".stat-card")!.querySelector("strong"),
+        ).toHaveTextContent("$0.0M");
     });
 });
