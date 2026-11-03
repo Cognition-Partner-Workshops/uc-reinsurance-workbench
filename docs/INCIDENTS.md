@@ -94,6 +94,14 @@ layers before updating the entity. The seeded Quoted submission has no pricing
 result rows, so taking the maximum calculation date from the empty sequence
 throws an `InvalidOperationException`.
 
+## Resolution
+
+`SubmissionService.Transition` now projects `CalculatedOn` to `DateTime?` before
+taking the maximum, so an empty pricing-result set yields `null` and the decline
+note records "no quote on record" instead of failing. The planted incident test
+asserts the successful Declined transition for both the no-pricing and
+with-pricing cases.
+
 # UI incident: quota-share treaty detail
 
 ## Symptom
