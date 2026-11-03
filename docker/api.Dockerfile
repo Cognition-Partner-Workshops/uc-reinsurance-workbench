@@ -5,6 +5,9 @@ ENV MONO_ENV_OPTIONS=--interp
 WORKDIR /src
 COPY src/ /src/
 
+# Mono 6.12 ships a stale certificate store; sync it from the OS bundle so nuget restore can reach nuget.org over TLS.
+RUN cert-sync /etc/ssl/certs/ca-certificates.crt
+
 RUN nuget restore Reinsurance.Core/packages.config -PackagesDirectory /src/packages \
     && nuget restore Reinsurance.Data/packages.config -PackagesDirectory /src/packages \
     && nuget restore Reinsurance.Services/packages.config -PackagesDirectory /src/packages \
