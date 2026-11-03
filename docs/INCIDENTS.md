@@ -1,5 +1,10 @@
 # Pricing incident: Atlas layer pricing
 
+**Status: fixed** (Sentry `BACKEND-REINSURANCE-DEMO-1`). `LayerHitFraction` now
+returns `0` when the attachment reaches or exceeds the portfolio `PML250`, so
+`POST /api/treaties/3/price` returns HTTP 200 with a zero expected loss for the
+Atlas layer. The sections below describe the incident as it was planted.
+
 ## Symptom
 
 Pricing the third layer of `Atlas Specialty Property Cat XoL 2026` returns HTTP
@@ -30,9 +35,9 @@ Atlas boundary case leaves that denominator at zero. The raw
 `DivideByZeroException` propagates through pricing and is captured by the API
 exception handling path.
 
-The planted incident test pins this failure mode and verifies that the exception
-is captured by Sentry. If the incident is fixed, update the test to assert a
-finite hit fraction and revise the endpoint evidence accordingly.
+`Reinsurance.Tests.Incidents.AtlasPricingIncidentTests` and
+`PricingCalculatorTests.AttachmentEqualToPml250PricesAsZeroExpectedLossInsteadOfThrowing`
+now assert the finite hit fraction and that no Sentry event is produced.
 
 # Loss-history incident: Sakura General burning cost
 

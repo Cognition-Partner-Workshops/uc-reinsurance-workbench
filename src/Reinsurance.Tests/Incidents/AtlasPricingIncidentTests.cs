@@ -7,10 +7,11 @@ using Reinsurance.Tests.Fakes;
 namespace Reinsurance.Tests.Incidents
 {
     /// <summary>
-    /// Pins the current Atlas divide-by-zero failure mode; when fixed, flip this to assert a finite hit fraction.
+    /// Regression coverage for the Atlas divide-by-zero incident (Sentry BACKEND-REINSURANCE-DEMO-1):
+    /// a layer attaching at the portfolio PML250 must price with a finite hit fraction and not reach Sentry.
     /// </summary>
     [TestFixture]
-    [Category("PlantedIncident")]
+    [Category("Unit")]
     public class AtlasPricingIncidentTests
     {
         private FakeTransport _transport;
@@ -22,19 +23,25 @@ namespace Reinsurance.Tests.Incidents
         }
 
         [Test]
-        public void AttachmentEqualToPml250ThrowsDivideByZero()
+        public void AttachmentEqualToPml250ReturnsFiniteHitFraction()
         {
-            Assert.Throws<DivideByZeroException>(() => PricingCalculator.Calculate(new PricingInput
+            Assert.That(PricingCalculator.LayerHitFraction(25000000m, 300000000m, 300000000m), Is.EqualTo(0m));
+
+            var result = PricingCalculator.Calculate(new PricingInput
             {
                 Limit = 25000000m,
                 Attachment = 300000000m,
                 PML250 = 300000000m,
                 AAL = 9000000m
-            }));
+            });
+
+            Assert.That(result.ExpectedLoss, Is.EqualTo(0m));
+            Assert.That(result.TechnicalPremium, Is.EqualTo(0m));
+            Assert.That(result.RateOnLine, Is.EqualTo(0m));
         }
 
         [Test]
-        public void SentryCapturesAtlasCalculationFailure()
+        public void SentryDoesNotCaptureAtlasCalculation()
         {
             _transport = new FakeTransport();
             SentrySdk.Init(options =>
@@ -61,7 +68,7 @@ namespace Reinsurance.Tests.Incidents
             }
 
             SentrySdk.Close();
-            Assert.That(_transport.Envelopes, Has.Count.EqualTo(1));
+            Assert.That(_transport.Envelopes, Is.Empty);
         }
 
     }
