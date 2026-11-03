@@ -45,20 +45,22 @@ include the API path and HTTP status.
 
 ## Reproducing test events
 
-Backend Atlas error:
+The Atlas pricing incident (`POST /api/treaties/3/price`) is fixed and no longer
+produces a Sentry event; see [INCIDENTS.md](INCIDENTS.md).
+
+Backend Sakura error:
 
 ```powershell
-Invoke-WebRequest -Method Post http://localhost:5055/api/treaties/3/price
+Invoke-WebRequest http://localhost:5055/api/loss-history?cedentId=6
 ```
 
-This exercises the planted Atlas pricing failure and should produce a backend
-Sentry issue when `SENTRY_DSN` is configured.
+This exercises the planted Sakura loss-history failure and should produce a
+backend Sentry issue when `SENTRY_DSN` is configured.
 
-Frontend Atlas error:
+Frontend error:
 
-1. Open the pricing screen for Atlas treaty 3.
-2. Select layer 3.
-3. Click **Save quote**.
+1. Open `Submissions → SUB-2026-0006`.
+2. Choose **Transition → Declined**.
 
 The API returns the planted 500 response; the frontend displays the trace ID and
 captures the server error.

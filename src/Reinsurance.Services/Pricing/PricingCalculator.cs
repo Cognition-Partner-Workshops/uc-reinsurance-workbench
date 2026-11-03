@@ -52,8 +52,10 @@ namespace Reinsurance.Services.Pricing
         public static decimal LayerHitFraction(decimal layerLimit, decimal attachment, decimal pml250)
         {
             if (pml250 <= 0m) return 0m;
-            var first = Clamp((pml250 - attachment) / pml250, 0m, 1m);
-            var second = Clamp(layerLimit / (pml250 - attachment), 0m, 1m);
+            var remainingLoss = pml250 - attachment;
+            if (remainingLoss <= 0m) return 0m;
+            var first = Clamp(remainingLoss / pml250, 0m, 1m);
+            var second = Clamp(layerLimit / remainingLoss, 0m, 1m);
             return first * second;
         }
 
