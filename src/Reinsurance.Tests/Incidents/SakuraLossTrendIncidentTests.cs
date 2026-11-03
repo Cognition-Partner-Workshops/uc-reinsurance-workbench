@@ -39,7 +39,7 @@ namespace Reinsurance.Tests.Incidents
                 new LossEvent
                 {
                     CedentId = 1,
-                    LossDate = new DateTime(2021, 9, 15),
+                    LossDate = new DateTime(2024, 6, 15),
                     GroundUpLoss = 1750000m
                 }
             }));

@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import SubmissionQueueScreen from "./SubmissionQueueScreen";
 
 const submissions = {
@@ -54,6 +54,10 @@ describe("SubmissionQueueScreen", () => {
         );
     });
 
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
     it("filters rows when a status chip is selected", async () => {
         const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
         render(
@@ -92,5 +96,41 @@ describe("SubmissionQueueScreen", () => {
             expect(screen.getByText("SUB-2026-0001")).toBeInTheDocument();
         });
         expect(screen.queryByText("SUB-2026-0002")).not.toBeInTheDocument();
+    });
+
+    it("shows a renewal badge for open submissions only", async () => {
+        vi.useFakeTimers({ toFake: ["Date"] });
+        vi.setSystemTime(new Date(2026, 11, 21, 10, 0, 0));
+        const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+        render(
+            <QueryClientProvider client={client}>
+                <MemoryRouter>
+                    <SubmissionQueueScreen />
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        expect(await screen.findByText("SUB-2026-0001")).toBeInTheDocument();
+        const badge = screen.getByText("Renewal due in 10 days");
+        expect(badge).toHaveClass("renewal-badge", "renewal-red");
+        expect(screen.getAllByText(/Renewal due in/)).toHaveLength(1);
+        expect(screen.queryByText("Lapsed")).not.toBeInTheDocument();
+    });
+
+    it("shows Lapsed after the expiry date", async () => {
+        vi.useFakeTimers({ toFake: ["Date"] });
+        vi.setSystemTime(new Date(2027, 0, 5, 10, 0, 0));
+        const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+        render(
+            <QueryClientProvider client={client}>
+                <MemoryRouter>
+                    <SubmissionQueueScreen />
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        expect(await screen.findByText("SUB-2026-0001")).toBeInTheDocument();
+        expect(screen.getAllByText("Lapsed")).toHaveLength(1);
+        expect(screen.getByText("Lapsed")).toHaveClass("renewal-lapsed");
     });
 });

@@ -19,6 +19,7 @@ import type {
 } from "../api/types";
 import { SubmissionStatus, submissionStatusLabels } from "../api/types";
 import { fmtDate } from "../domain/format";
+import { renewalBadge } from "../domain/renewal";
 import { ErrorBanner, PageHeader, StatusPill } from "../components/Ui";
 
 const filters = [
@@ -102,6 +103,7 @@ export default function SubmissionQueueScreen() {
                     <span>Underwriter</span>
                     <span>Received</span>
                     <span>Status</span>
+                    <span>Renewal</span>
                 </div>
                 {rows.map((row) => (
                     <button
@@ -116,6 +118,7 @@ export default function SubmissionQueueScreen() {
                         <span>{row.underwriterName}</span>
                         <span>{fmtDate(row.receivedOn)}</span>
                         <StatusPill status={row.status} />
+                        <RenewalBadge status={row.status} expiryDate={row.expiryDate} />
                     </button>
                 ))}
                 {!rows.length && (
@@ -138,6 +141,12 @@ export default function SubmissionQueueScreen() {
             )}
         </>
     );
+}
+
+function RenewalBadge({ status, expiryDate }: { status: SubmissionStatus; expiryDate: string }) {
+    const badge = renewalBadge(status, expiryDate);
+    if (!badge) return <span />;
+    return <span className={`renewal-badge renewal-${badge.tone}`}>{badge.label}</span>;
 }
 
 function NewSubmissionModal({
