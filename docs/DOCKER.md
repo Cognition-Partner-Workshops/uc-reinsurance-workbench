@@ -61,18 +61,14 @@ DSNs; `.env` is git-ignored.
 
 ## Firing the planted incidents
 
-All four incidents from [INCIDENTS.md](INCIDENTS.md) reproduce in the compose
+The open incidents from [INCIDENTS.md](INCIDENTS.md) reproduce in the compose
 stack. With the DSNs unset you get the HTTP 500 / error fallback without
 creating Sentry events; set `SENTRY_DSN` / `VITE_SENTRY_DSN` in `.env` and
 restart (`docker compose up --build -d`) to have them appear in Sentry.
 
-1. **Atlas layer pricing** (`DivideByZeroException`)
-
-   ```bash
-   curl -si -X POST http://localhost:5055/api/treaties/3/price
-   ```
-
-   UI: *Pricing → Atlas treaty 3 → layer 3 → Save quote*.
+1. **Atlas layer pricing** (fixed; `POST /api/treaties/3/price` now returns
+   HTTP 200 with zero expected loss for the layer whose attachment equals
+   `PML250`)
 
 2. **Sakura loss history** (`KeyNotFoundException`)
 
