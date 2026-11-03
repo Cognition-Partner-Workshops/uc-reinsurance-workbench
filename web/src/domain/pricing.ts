@@ -36,23 +36,12 @@ export function priceLayer(
             profitMarginPct: 0,
         };
     }
-    const denominator = model.pmL250 - layer.attachment;
-    if (denominator === 0) {
-        return {
-            error: true,
-            expectedLoss: 0,
-            riskLoad: 0,
-            expenseLoad: 0,
-            technicalPremium: 0,
-            ourShareLine: 0,
-            rateOnLine: 0,
-            lossCostPct: 0,
-            profitMarginPct: 0,
-        };
-    }
+    const lossAboveAttachment = model.pmL250 - layer.attachment;
     const hit =
-        clamp((model.pmL250 - layer.attachment) / model.pmL250, 0, 1) *
-        clamp(layer.limit / denominator, 0, 1);
+        lossAboveAttachment <= 0
+            ? 0
+            : clamp(lossAboveAttachment / model.pmL250, 0, 1) *
+              clamp(layer.limit / lossAboveAttachment, 0, 1);
     const elRaw = model.aal * hit;
     const riskLoad = round(0.15 * Math.sqrt(elRaw * layer.limit), 2);
     const expenseLoad = round(0.12 * (elRaw + riskLoad), 2);

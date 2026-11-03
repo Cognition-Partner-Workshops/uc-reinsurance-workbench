@@ -51,17 +51,19 @@ Backend Atlas error:
 Invoke-WebRequest -Method Post http://localhost:5055/api/treaties/3/price
 ```
 
-This exercises the planted Atlas pricing failure and should produce a backend
-Sentry issue when `SENTRY_DSN` is configured.
+The Atlas pricing failure (`BACKEND-REINSURANCE-DEMO-1`) is fixed, so this now
+returns HTTP 200 and does not produce a Sentry event. Use the Sakura loss-history
+or decline-transition incidents in [INCIDENTS.md](INCIDENTS.md) to generate a
+backend test event instead.
 
-Frontend Atlas error:
+Frontend Atlas flow:
 
 1. Open the pricing screen for Atlas treaty 3.
 2. Select layer 3.
 3. Click **Save quote**.
 
-The API returns the planted 500 response; the frontend displays the trace ID and
-captures the server error.
+The quote saves with a zero expected loss; no frontend server-error event is
+captured.
 
 ## Webhook path to Devin
 

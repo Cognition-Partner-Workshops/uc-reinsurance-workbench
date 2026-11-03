@@ -86,8 +86,18 @@ describe("priceLayer", () => {
         expect(result.technicalPremium).toBe(result.riskLoad + result.expenseLoad);
     });
 
-    it("returns a preview error when attachment equals PML250", () => {
-        expect(priceLayer(layer({ attachment: model.pmL250 }), model).error).toBe(true);
+    it("prices a zero hit fraction instead of an error when attachment equals PML250", () => {
+        const result = priceLayer(layer({ attachment: model.pmL250 }), model);
+        expect(result.error).toBe(false);
+        expect(result.expectedLoss).toBe(0);
+        expect(result.technicalPremium).toBe(0);
+        expect(result.rateOnLine).toBe(0);
+    });
+
+    it("prices a zero hit fraction when attachment exceeds PML250", () => {
+        const result = priceLayer(layer({ attachment: model.pmL250 + 1 }), model);
+        expect(result.error).toBe(false);
+        expect(result.expectedLoss).toBe(0);
     });
 
     it("increases premium for reinstatements", () => {
