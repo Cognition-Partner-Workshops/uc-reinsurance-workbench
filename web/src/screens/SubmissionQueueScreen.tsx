@@ -19,6 +19,7 @@ import type {
 } from "../api/types";
 import { SubmissionStatus, submissionStatusLabels } from "../api/types";
 import { fmtDate } from "../domain/format";
+import { renewalBadge } from "../domain/renewal";
 import { ErrorBanner, PageHeader, StatusPill } from "../components/Ui";
 
 const filters = [
@@ -101,6 +102,7 @@ export default function SubmissionQueueScreen() {
                     <span>Broker</span>
                     <span>Underwriter</span>
                     <span>Received</span>
+                    <span>Renewal</span>
                     <span>Status</span>
                 </div>
                 {rows.map((row) => (
@@ -115,6 +117,7 @@ export default function SubmissionQueueScreen() {
                         <span>{row.brokerName}</span>
                         <span>{row.underwriterName}</span>
                         <span>{fmtDate(row.receivedOn)}</span>
+                        <RenewalBadge expiryDate={row.expiryDate} status={row.status} />
                         <StatusPill status={row.status} />
                     </button>
                 ))}
@@ -137,6 +140,19 @@ export default function SubmissionQueueScreen() {
                 />
             )}
         </>
+    );
+}
+
+function RenewalBadge({ expiryDate, status }: { expiryDate: string; status: SubmissionStatus }) {
+    const badge = renewalBadge(expiryDate, status);
+    if (!badge) return <span />;
+    return (
+        <span
+            className={`status-pill renewal-badge renewal-${badge.tone}`}
+            title={`Expires ${fmtDate(expiryDate, true)}`}
+        >
+            {badge.label}
+        </span>
     );
 }
 

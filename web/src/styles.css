@@ -273,7 +273,7 @@ h2 {
     grid-template-columns: minmax(220px, 2.2fr) 1fr 1fr 1fr 96px;
 }
 .queue-grid {
-    grid-template-columns: 1.1fr 1.5fr 0.6fr 1.4fr 1.3fr 1fr 96px;
+    grid-template-columns: 1.1fr 1.5fr 0.6fr 1.4fr 1.3fr 0.8fr 160px 96px;
 }
 .layers-grid {
     grid-template-columns: 0.6fr 1fr 1fr 1fr 1fr 0.8fr 1fr;
@@ -376,6 +376,18 @@ h2 {
 .status-withdrawn {
     background: rgba(25, 25, 25, 0.06);
     color: rgba(25, 25, 25, 0.56);
+}
+.renewal-amber {
+    background: rgba(245, 166, 35, 0.18);
+    color: #9a5b00;
+}
+.renewal-red {
+    background: rgba(245, 59, 58, 0.12);
+    color: #d12c2b;
+}
+.renewal-lapsed {
+    background: #d12c2b;
+    color: #fff;
 }
 .stats-grid {
     display: grid;
